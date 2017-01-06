@@ -1,0 +1,13 @@
+{
+    "name": "coff/hellfire",
+    "description": "Heating system control device program for Raspberry Pi",
+    "type": "project",
+    "license": "MIT License",
+    "authors": [
+        {
+            "name": "Krzysztof Kubanek",
+            "email": "krzysztof.kubanek@gmail.com"
+        }
+    ],
+    "require": {}
+}
