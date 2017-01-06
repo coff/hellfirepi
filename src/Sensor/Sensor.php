@@ -1,5 +1,7 @@
 <?php
 
+namespace Hellfire\Sensor;
+
 
 abstract class Sensor implements SensorInterface
 {

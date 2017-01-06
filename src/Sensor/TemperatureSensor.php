@@ -1,5 +1,6 @@
 <?php
 
+namespace Hellfire\Sensor;
 
 class TemperatureSensor extends Sensor
 {

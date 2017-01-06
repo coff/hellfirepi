@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 function loop() {
@@ -63,3 +64,5 @@ function loop() {
 
 
 }
+
+loop();

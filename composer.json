@@ -9,5 +9,10 @@
             "email": "krzysztof.kubanek@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Hellfire\\": "src/"
+        },
+    },
     "require": {}
 }
