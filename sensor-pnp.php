@@ -40,7 +40,7 @@ function loop() {
                 echo $key.'. '.$descr.PHP_EOL;
             }
 
-            $descrId = readline('Choose sensor type for ' . $fileInfo->getFilename() . ':');
+            $descrId = readline('Choose sensor type for ' . $fileInfo->getPathname() . ':');
 
             $alreadyDiscovered[$fileInfo->getFilename()] = array($descrId, $descriptionsLeft[$descrId]);
             if ($descrId !== 0) {
@@ -54,7 +54,7 @@ function loop() {
         }
 
         if ($noNewDiscoveries > 15) {
-            $readline = readline("No sensors, continue? [Y/N]");
+            $readline = readline("No sensors, finished? [Y/N]");
             if ($readline == 'Y') {
                 break;
             }
