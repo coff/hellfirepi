@@ -8,7 +8,7 @@ class TemperatureSensor extends Sensor
     protected $resource;
 
 
-    public function __construct($description, $device=null, $measureUnit='celsius', $measureSuffix='C') {
+    public function __construct($description, $device=null, $measureUnit='celsius', $measureSuffix='°C') {
         $this->measureUnit = $measureUnit;
         $this->measureSuffix = $measureSuffix;
         $this->device = $device;
@@ -27,9 +27,9 @@ class TemperatureSensor extends Sensor
     }
 
     public function update() {
-        $crcLine = fgets($this->resource);
-        $valueLine = fgets($this->resource);
-
+        fseek($this->resource, 0);
+        $crcLine = trim(fgets($this->resource));
+        $valueLine = trim(fgets($this->resource));
         if (substr($crcLine,-1) == 'S') { // YE(S)
             $this->value = (double)explode('=', substr($valueLine,-8))[1] / 1000;
         }
