@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 
+include('vendor/autoload.php');
+
 function loop() {
 
     $descriptionsLeft = [
@@ -23,14 +25,18 @@ function loop() {
 
         foreach (new DirectoryIterator('/sys/bus/w1/devices/') as $fileInfo) {
 
-
             # not interested
             if($fileInfo->isDot()) {
                 continue;
             }
 
+            if(false === file_exists($sensorPath = $fileInfo->getPathname() . '/w1_slave')) {
+                continue;
+            }
+
+
             # already discovered
-            if (isset($alreadyDiscovered[$fileInfo->getPathname()])) {
+            if (isset($alreadyDiscovered[$fileInfo->getFilename()])) {
                 continue;
             }
 
@@ -39,6 +45,11 @@ function loop() {
             foreach ($descriptionsLeft as $key => $descr) {
                 echo $key.'. '.$descr.PHP_EOL;
             }
+
+            $sensor = new Hellfire\Sensor\TemperatureSensor('unknown', $sensorPath);
+            $sensor->update();
+
+            echo 'Sensor found with reading: ' . $sensor->render() . PHP_EOL;
 
             $descrId = readline('Choose sensor type for ' . $fileInfo->getPathname() . ':');
 
