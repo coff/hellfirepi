@@ -3,10 +3,17 @@
 namespace Hellfire\Sensor;
 
 
+use Hellfire\Enum\MeasureUnit;
+
 abstract class Sensor implements SensorInterface
 {
     protected $value;
+
+    /**
+     * @var MeasureUnit
+     */
     protected $measureUnit;
+
     protected $measureSuffix;
     protected $description;
 
