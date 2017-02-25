@@ -4,9 +4,167 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c862b4bf48b109fdc4f2b814792aa60b",
-    "content-hash": "f74feecc47bc38e0fa700181a5a98986",
+    "hash": "903ae434fa766b2a5e15e4cd0b5accf0",
+    "content-hash": "d8d0ec3539ba7a76e914875e4d8f0ace",
     "packages": [
+        {
+            "name": "coff/php-api-datasource",
+            "version": "v0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coff/php-api-datasource.git",
+                "reference": "337001a5f4e3b8891d37507be261514a0e632f75"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coff/php-api-datasource/zipball/337001a5f4e3b8891d37507be261514a0e632f75",
+                "reference": "337001a5f4e3b8891d37507be261514a0e632f75",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Coff\\DataSource\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Krzysztof Kubanek",
+                    "email": "krzysztof.kubanek@gmail.com"
+                }
+            ],
+            "description": "API package for DataSource class",
+            "support": {
+                "source": "https://github.com/coff/php-api-datasource/tree/v0.0.4",
+                "issues": "https://github.com/coff/php-api-datasource/issues"
+            },
+            "time": "2017-02-19 23:01:04"
+        },
+        {
+            "name": "coff/php-spi-max6675",
+            "version": "v0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coff/php-spi-max6675.git",
+                "reference": "635647c4495a586bfe8db2cbf1fd8a3c07ba2819"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coff/php-spi-max6675/zipball/635647c4495a586bfe8db2cbf1fd8a3c07ba2819",
+                "reference": "635647c4495a586bfe8db2cbf1fd8a3c07ba2819",
+                "shasum": ""
+            },
+            "require": {
+                "coff/php-api-datasource": "~0.0.4",
+                "ext-spi": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Coff\\Max6675\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Krzysztof Kubanek",
+                    "email": "krzysztof.kubanek@gmail.com"
+                }
+            ],
+            "description": "MAX6675 thermocouple controller communication library over SPI",
+            "support": {
+                "source": "https://github.com/coff/php-spi-max6675/tree/v0.0.2",
+                "issues": "https://github.com/coff/php-spi-max6675/issues"
+            },
+            "time": "2017-02-24 21:20:11"
+        },
+        {
+            "name": "coff/php-spi-mcp3008",
+            "version": "v0.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coff/php-spi-mcp3008.git",
+                "reference": "d040c82858d81e209da72df03c5c23b72e6088ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coff/php-spi-mcp3008/zipball/d040c82858d81e209da72df03c5c23b72e6088ac",
+                "reference": "d040c82858d81e209da72df03c5c23b72e6088ac",
+                "shasum": ""
+            },
+            "require": {
+                "coff/php-api-datasource": "^0.0.4",
+                "ext-spi": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Coff\\Mcp3008\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Krzysztof Kubanek",
+                    "email": "krzysztof.kubanek@gmail.com"
+                }
+            ],
+            "description": "Library for handling mcp3008 analog to digital converter over spi",
+            "support": {
+                "source": "https://github.com/coff/php-spi-mcp3008/tree/master",
+                "issues": "https://github.com/coff/php-spi-mcp3008/issues"
+            },
+            "time": "2017-02-19 23:40:45"
+        },
+        {
+            "name": "coff/php-w1-server-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coff/php-w1-server-client.git",
+                "reference": "6ce968f4472c61f513d98fe962578e98214c8922"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coff/php-w1-server-client/zipball/6ce968f4472c61f513d98fe962578e98214c8922",
+                "reference": "6ce968f4472c61f513d98fe962578e98214c8922",
+                "shasum": ""
+            },
+            "require": {
+                "coff/php-api-datasource": "^0.0.4",
+                "monolog/monolog": "^1.22",
+                "symfony/console": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Coff\\OneWire\\": "src/",
+                    "Coff\\OneWire\\Examples\\": "examples/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Krzysztof Kubanek",
+                    "email": "krzysztof.kubanek@gmail.com"
+                }
+            ],
+            "description": "One-Wire (1-wire) devices server & client",
+            "support": {
+                "source": "https://github.com/coff/php-w1-server-client/tree/master",
+                "issues": "https://github.com/coff/php-w1-server-client/issues"
+            },
+            "time": "2017-02-19 23:44:07"
+        },
         {
             "name": "garoevans/php-enum",
             "version": "1.2.0",
@@ -143,6 +301,100 @@
             "time": "2016-11-26 00:15:39"
         },
         {
+            "name": "pimple/pimple",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silexphp/Pimple.git",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Pimple, a simple Dependency Injection Container",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2015-09-11 15:10:35"
+        },
+        {
+            "name": "piphp/gpio",
+            "version": "v0.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PiPHP/GPIO.git",
+                "reference": "5d2c5b8f6fa7b3327b29ed88fcee0e89a3ca398b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PiPHP/GPIO/zipball/5d2c5b8f6fa7b3327b29ed88fcee0e89a3ca398b",
+                "reference": "5d2c5b8f6fa7b3327b29ed88fcee0e89a3ca398b",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PiPHP\\GPIO\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "PiPHP\\Test\\GPIO\\": "test/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrew Carter",
+                    "email": "andrewcarter1992@gmail.com"
+                }
+            ],
+            "description": "A library for accessing the GPIO pins on a Raspberry Pi",
+            "keywords": [
+                "gpio",
+                "pi",
+                "pin",
+                "pins",
+                "raspberry"
+            ],
+            "support": {
+                "source": "https://github.com/PiPHP/GPIO/tree/v0.3.3",
+                "issues": "https://github.com/PiPHP/GPIO/issues"
+            },
+            "time": "2016-07-09 11:38:12"
+        },
+        {
             "name": "psr/log",
             "version": "1.0.2",
             "source": {
@@ -191,16 +443,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v3.2.1",
+            "version": "v3.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "d12aa9ca20f4db83ec58410978dab6afcb9d6aaa"
+                "reference": "0e5e6899f82230fcb1153bcaf0e106ffaa44b870"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/d12aa9ca20f4db83ec58410978dab6afcb9d6aaa",
-                "reference": "d12aa9ca20f4db83ec58410978dab6afcb9d6aaa",
+                "url": "https://api.github.com/repos/symfony/console/zipball/0e5e6899f82230fcb1153bcaf0e106ffaa44b870",
+                "reference": "0e5e6899f82230fcb1153bcaf0e106ffaa44b870",
                 "shasum": ""
             },
             "require": {
@@ -250,20 +502,20 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-12-11 14:34:22"
+            "time": "2017-02-16 14:07:22"
         },
         {
             "name": "symfony/debug",
-            "version": "v3.2.1",
+            "version": "v3.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
-                "reference": "9f923e68d524a3095c5a2ae5fc7220c7cbc12231"
+                "reference": "9b98854cb45bc59d100b7d4cc4cf9e05f21026b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/9f923e68d524a3095c5a2ae5fc7220c7cbc12231",
-                "reference": "9f923e68d524a3095c5a2ae5fc7220c7cbc12231",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/9b98854cb45bc59d100b7d4cc4cf9e05f21026b9",
+                "reference": "9b98854cb45bc59d100b7d4cc4cf9e05f21026b9",
                 "shasum": ""
             },
             "require": {
@@ -307,7 +559,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-16 22:18:16"
+            "time": "2017-02-16 16:34:18"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -372,7 +624,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "coff/php-w1-server-client": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

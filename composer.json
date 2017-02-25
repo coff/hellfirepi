@@ -10,19 +10,44 @@
         }
     ],
     "repositories": [
-      {
+        {
         "type": "vcs",
         "url": "https://github.com/garoevans/php-enum.git"
-      }
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/coff/php-w1-server-client.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/coff/php-spi-max6675.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/coff/php-spi-mcp3008.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/coff/php-api-datasource.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/PiPHP/GPIO.git"
+        }
     ],
     "autoload": {
         "psr-4": {
-            "Hellfire\\": "src/"
+            "Coff\\Hellfire\\": "src/"
         }
     },
     "require": {
+        "piphp/gpio": "^0.3",
         "garoevans/php-enum": "^1.2",
         "monolog/monolog": "^1.22",
-        "symfony/console": "^3.2"
+        "symfony/console": "^3.2",
+        "coff/php-w1-server-client": "dev-master",
+        "coff/php-spi-mcp3008": "~0.0.3",
+        "coff/php-spi-max6675": "~0.0.2",
+        "pimple/pimple": "~3.0"
     }
 }
