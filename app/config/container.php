@@ -4,6 +4,7 @@ namespace Hellfire;
 
 use Coff\Hellfire\ComponentArray\DataSourceArray;
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
+use Coff\Hellfire\ComponentArray\RelayArray;
 use Coff\Hellfire\Relay\Relay;
 use Coff\Hellfire\Server\HellfireServer;
 use Coff\Hellfire\System\AirIntakeSystem;
@@ -66,9 +67,10 @@ $container['data-sources:relays'] = function($c) {
     /** @var GPIO $gpio */
     $gpio = $c['gpio'];
 
-    $gpioNumbers = [27, 28, 29, 25, 24, 23, 22, 21];
+    /** @var array $gpioNumbers according to BCM numeration */
+    $gpioNumbers = [16, 20, 21, 26, 19, 13, 6, 5];
 
-    $relays = new DataSourceArray();
+    $relays = new RelayArray();
 
     $i=0;
     foreach($gpioNumbers as $number) {

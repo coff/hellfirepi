@@ -82,4 +82,12 @@ class DataSourceArray extends ComponentArray
     public function onEach(callable $callback) {
         array_walk($this->components, $callback);
     }
+
+    /**
+     * Returns components as array for easier array-like operations.
+     * @return array
+     */
+    public function toArray() {
+        return $this->components;
+    }
 }

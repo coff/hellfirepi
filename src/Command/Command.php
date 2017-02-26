@@ -3,10 +3,20 @@
 namespace Coff\Hellfire\Command;
 
 use Coff\Hellfire\Application\HellfireApplication;
-use Symfony\Component\Console\Command\Command;
+use Pimple\Container;
 
-class HellfireCommand extends Command
+/**
+ * Command
+ *
+ * Basic Hellfire Command with Pimple container attached.
+ */
+abstract class Command extends \Symfony\Component\Console\Command\Command
 {
+    /**
+     * Returns pimple DI container
+     *
+     * @return Container
+     */
     public function getContainer() {
         /** @var HellfireApplication $app */
         $app = $this->getApplication();

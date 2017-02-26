@@ -2,6 +2,14 @@
 
 ## dev-master
 
+Added note for relays setup about pin numeration (BCM). Shall introduce mapper
+ some day to solve it permanently.
+
+Implemented `FixPermissionsInstallCommand` and `RelaysTestCommand`.
+
+Refactored hellfire commands. Commands are split into three groups so far:
+ `install`, `server`, `test`.
+
 Lots of code quality fixes.
 
 Vendor updated.

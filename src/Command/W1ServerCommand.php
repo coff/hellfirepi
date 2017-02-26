@@ -12,11 +12,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Launches One-Wire server service
  */
-class W1ServerCommand extends HellfireCommand
+class W1ServerCommand extends Command
 {
     public function configure()
     {
-        $this->setName('w1-server');
+        $this
+            ->setName('server:one-wire')
+            ->setDescription('Starts One-Wire sensors server (It\'s required to run main server)')
+            ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

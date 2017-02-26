@@ -7,11 +7,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * CreateStorageCommand
+ * InstallStorageCommand
  *
  * A command for (re-)creating database storage for HellfirePi
  */
-class CreateStorageCommand extends HellfireCommand
+class StorageInstallCommand extends Command
 {
     /**
      * @var \PDO
@@ -41,7 +41,10 @@ SQL;
 
     public function configure()
     {
-        $this->setName('create-storage');
+        $this
+            ->setName('install:storage')
+            ->setDescription('Installs database storage for readings')
+        ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -49,10 +52,10 @@ SQL;
         $this->pdo->beginTransaction();
 
         $this->pdo->exec($this->dropQuery);
-        $this->logger->info('Storage table dropped (if existed).');
+        $this->logger->info('Storage table dropped (if existed)');
 
         $this->pdo->exec($this->createQuery);
-        $this->logger->info('Storage table created.');
+        $this->logger->info('Storage table created');
 
         $this->pdo->commit();
     }
