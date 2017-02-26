@@ -3,6 +3,7 @@
 namespace Coff\Hellfire\System;
 
 use Coff\DataSource\DataSourceInterface;
+use Hellfire\Servo\AnalogServo;
 
 class AirIntakeSystem extends System implements DataSourceInterface
 {
@@ -14,6 +15,7 @@ class AirIntakeSystem extends System implements DataSourceInterface
 
     protected $position;
     protected $stepValue=1;
+    protected $servo;
 
     public function init() {
         $this->open();
@@ -67,6 +69,12 @@ class AirIntakeSystem extends System implements DataSourceInterface
 
     public function getStamp()
     {
-        // TODO: Implement getStamp() method.
+
+    }
+
+    public function setServo(AnalogServo $servo) {
+        $this->servo = $servo;
+
+        return $this;
     }
 }

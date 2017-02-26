@@ -2,6 +2,12 @@
 
 ## dev-master
 
+Readme updated.
+
+Initial air intake boostrap.
+
+Deleted obsolete `TemperatureSensor` class.
+
 Added note for relays setup about pin numeration (BCM). Shall introduce mapper
  some day to solve it permanently.
 

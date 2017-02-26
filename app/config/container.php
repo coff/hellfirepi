@@ -17,11 +17,15 @@ use Coff\OneWire\ClientTransport\XmlW1ClientTransport;
 use Coff\OneWire\Sensor\DS18B20Sensor;
 use Coff\OneWire\Server\W1Server;
 use Coff\OneWire\ServerTransport\XmlW1ServerTransport;
+use Hellfire\Servo\AnalogServo;
 use PiPHP\GPIO\GPIO;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+/**
+ * @todo extract configuration parameters into a separate readable config file.
+ */
 
 $container['logger'] = function () {
     $logger = new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG, $isDecorated=true, new OutputFormatter()));
@@ -37,7 +41,6 @@ $container['client:one-wire'] = function($c) {
     $client->setLogger($c['logger']);
     $client->setTransport(new XmlW1ClientTransport());
     $client->init();
-
 
     return $client;
 };
@@ -174,9 +177,17 @@ $container['system:buffer'] = function ($c) {
 };
 
 $container['system:intake'] = function() {
-    $intake = new AirIntakeSystem();
-    $intake->init();
+    $servo = new AnalogServo();
 
+    /** physical pin 15? */
+    $servo->setGpio(15);
+
+
+    $intake = new AirIntakeSystem();
+    $intake
+        ->setServo($servo)
+        ->init()
+        ;
     return $intake;
 };
 
