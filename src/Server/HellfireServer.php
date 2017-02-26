@@ -8,7 +8,6 @@ use Coff\Hellfire\System\BoilerSystem;
 use Coff\Hellfire\System\BufferSystem;
 use Coff\Hellfire\System\HeaterSystem;
 use Coff\OneWire\Client\AsyncW1Client;
-use Pimple\Container;
 
 class HellfireServer extends Server
 {
@@ -39,8 +38,6 @@ class HellfireServer extends Server
 
     public function each()
     {
-        /** @var Container $container */
-        $container = $this->getContainer();
 
         /** @todo Server<->Client communication here? */
     }

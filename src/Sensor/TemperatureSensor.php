@@ -2,6 +2,7 @@
 
 namespace Hellfire\Sensor;
 
+use Coff\OneWire\Sensor\Sensor;
 use Hellfire\Conversion\TemperatureConversion;
 use Hellfire\Enum\TemperatureUnit;
 

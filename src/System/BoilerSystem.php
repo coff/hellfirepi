@@ -3,9 +3,6 @@
 namespace Coff\Hellfire\System;
 
 use Coff\DataSource\DataSource;
-use Coff\Hellfire\ComponentArray\DataSourceArray;
-use Coff\Hellfire\Relay\Relay;
-use Hellfire\Servo\AnalogServo;
 
 class BoilerSystem extends System
 {

@@ -3,6 +3,4 @@
 date_default_timezone_set('Europe/Warsaw');
 set_time_limit(0);
 
-require __DIR__ . '/../vendor/autoload.php';
-
-$container = require(__DIR__ . '/config/container.php');
+require(__DIR__ . '/config/container.php');

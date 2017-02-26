@@ -2,8 +2,6 @@
 
 namespace Coff\Hellfire\System;
 
-use Coff\Hellfire\ComponentArray\DataSourceArray;
-
 abstract class System implements SystemInterface
 {
 

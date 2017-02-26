@@ -16,13 +16,11 @@ use Coff\OneWire\ClientTransport\XmlW1ClientTransport;
 use Coff\OneWire\Sensor\DS18B20Sensor;
 use Coff\OneWire\Server\W1Server;
 use Coff\OneWire\ServerTransport\XmlW1ServerTransport;
-use Pimple\Container;
 use PiPHP\GPIO\GPIO;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-$container = new Container();
 
 $container['logger'] = function () {
     $logger = new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG, $isDecorated=true, new OutputFormatter()));
@@ -173,7 +171,7 @@ $container['system:buffer'] = function ($c) {
     return $buffer;
 };
 
-$container['system:intake'] = function($c) {
+$container['system:intake'] = function() {
     $intake = new AirIntakeSystem();
     $intake->init();
 

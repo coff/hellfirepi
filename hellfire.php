@@ -7,6 +7,11 @@ use Coff\Hellfire\Application\HellfireApplication;
 use Coff\Hellfire\Command\CreateStorageCommand;
 use Coff\Hellfire\Command\HellfireServerCommand;
 use Coff\Hellfire\Command\W1ServerCommand;
+use Pimple\Container;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$container = new Container();
 
 require (__DIR__ . '/app/bootstrap.php');
 

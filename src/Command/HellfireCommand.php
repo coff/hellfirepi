@@ -3,7 +3,6 @@
 namespace Coff\Hellfire\Command;
 
 use Coff\Hellfire\Application\HellfireApplication;
-use Pimple\Container;
 use Symfony\Component\Console\Command\Command;
 
 class HellfireCommand extends Command

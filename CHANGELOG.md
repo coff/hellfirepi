@@ -2,6 +2,8 @@
 
 ## dev-master
 
+Lots of code quality fixes.
+
 Vendor updated.
 
 `PumpTrait`, `SensorArrayTrait` implemented to reduce code duplication.

@@ -2,7 +2,7 @@
 
 namespace Hellfire\Servo;
 
-use Hellfire\Exception\HellfireException;
+use Coff\Hellfire\Exception\HellfireException;
 
 /**
  * AnalogServo for analog servo control over servoblaster library
@@ -40,7 +40,9 @@ class AnalogServo {
     protected $linearPos;
 
     /**
-     *
+     * @param int $travelRangeDeg
+     * @param int $signalMin
+     * @param int $signalMax
      */
     public function __construct($travelRangeDeg=180, $signalMin=500, $signalMax=2500) {
         $this->setTravelRangeSig($signalMin, $signalMax);
@@ -49,12 +51,21 @@ class AnalogServo {
         $this->setTravelRangeRad(0, $rad);
     }
 
+    /**
+     * @param $gpio
+     * @return $this
+     */
     public function setGpio($gpio) {
         $this->gpio = $gpio;
 
         return $this;
     }
 
+    /**
+     * @param int $min
+     * @param int $max
+     * @return $this
+     */
     public function setTravelRangeSig($min=500, $max=2500) {
         $this->travelRangeSig = [$min, $max];
         $this->signalTravel = $max-$min;
@@ -62,18 +73,32 @@ class AnalogServo {
         return $this;
     }
 
+    /**
+     * @param $degMin
+     * @param $degMax
+     * @return $this
+     */
     public function setTravelRangeDeg($degMin, $degMax) {
         $this->travelRangeDeg = [$degMin, $degMax];
 
         return $this;
     }
 
+    /**
+     * @param $radMin
+     * @param $radMax
+     * @return $this
+     */
     public function setTravelRangeRad($radMin, $radMax) {
         $this->travelRangeRad = [$radMin, $radMax];
 
         return $this;
     }
 
+    /**
+     * @param $armLength
+     * @return $this
+     */
     public function setArmLength($armLength) {
         $this->armLength = $armLength;
 
@@ -85,6 +110,9 @@ class AnalogServo {
         return $this;
     }
 
+    /**
+     * @param $linearPos
+     */
     public function linearMoveTo($linearPos) {
         $relPos = $linearPos / $this->linearTravel;
 

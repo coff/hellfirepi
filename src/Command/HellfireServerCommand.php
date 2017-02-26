@@ -2,7 +2,6 @@
 
 namespace Coff\Hellfire\Command;
 
-use Coff\Hellfire\Application\HellfireApplication;
 use Coff\Hellfire\Server\HellfireServer;
 use Pimple\Container;
 use Symfony\Component\Console\Input\InputInterface;

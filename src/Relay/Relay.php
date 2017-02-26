@@ -3,7 +3,7 @@
 namespace Coff\Hellfire\Relay;
 
 use Coff\DataSource\DataSourceInterface;
-use Hellfire\Exception\HellfireException;
+use Coff\Hellfire\Exception\HellfireException;
 use PiPHP\GPIO\Pin\OutputPinInterface;
 use PiPHP\GPIO\Pin\PinInterface;
 
