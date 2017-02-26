@@ -1,6 +1,6 @@
 <?php
 
-namespace Hellfire\Exception;
+namespace Coff\Hellfire\Exception;
 
 
 class HellfireException extends \Exception

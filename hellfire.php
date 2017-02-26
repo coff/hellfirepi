@@ -1,20 +1,22 @@
+#!/usr/bin/php
 <?php
 
 namespace Coff\Hellfire;
 
+use Coff\Hellfire\Application\HellfireApplication;
 use Coff\Hellfire\Command\CreateStorageCommand;
 use Coff\Hellfire\Command\HellfireServerCommand;
 use Coff\Hellfire\Command\W1ServerCommand;
-use Symfony\Component\Console\Application;
 
-include (__DIR__ . 'app/bootstrap.php');
+require (__DIR__ . '/app/bootstrap.php');
 
-$app = new Application();
+$app = new HellfireApplication('HellfirePi', '0.0.1');
+$app->setContainer($container);
 
-$app
-    ->add(new CreateStorageCommand())
-    ->add(new HellfireServerCommand())
-    ->add(new W1ServerCommand())
-    ;
+$app->add(new CreateStorageCommand());
+$app->add(new HellfireServerCommand());
+$app->add(new W1ServerCommand());
 
+
+$app->run();
 

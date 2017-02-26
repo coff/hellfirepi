@@ -1,8 +1,10 @@
 <?php
 
-namespace Coff\Hellfire\Heater;
+namespace Coff\Hellfire\System;
 
-abstract class Element implements ElementInterface
+use Coff\Hellfire\ComponentArray\DataSourceArray;
+
+abstract class System implements SystemInterface
 {
 
     protected $state;

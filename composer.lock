@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "903ae434fa766b2a5e15e4cd0b5accf0",
-    "content-hash": "d8d0ec3539ba7a76e914875e4d8f0ace",
+    "hash": "8a4f7db95c8fbe4acc6746f4066d22b2",
+    "content-hash": "34673ecb8ad88b0f859104ea0e645106",
     "packages": [
         {
             "name": "coff/php-api-datasource",
@@ -125,20 +125,20 @@
         },
         {
             "name": "coff/php-w1-server-client",
-            "version": "dev-master",
+            "version": "v0.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/coff/php-w1-server-client.git",
-                "reference": "6ce968f4472c61f513d98fe962578e98214c8922"
+                "reference": "834c869f939824cc4374f19454b43de3c2a74a8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/coff/php-w1-server-client/zipball/6ce968f4472c61f513d98fe962578e98214c8922",
-                "reference": "6ce968f4472c61f513d98fe962578e98214c8922",
+                "url": "https://api.github.com/repos/coff/php-w1-server-client/zipball/834c869f939824cc4374f19454b43de3c2a74a8f",
+                "reference": "834c869f939824cc4374f19454b43de3c2a74a8f",
                 "shasum": ""
             },
             "require": {
-                "coff/php-api-datasource": "^0.0.4",
+                "coff/php-api-datasource": "~0.0.4",
                 "monolog/monolog": "^1.22",
                 "symfony/console": "^3.2"
             },
@@ -160,10 +160,10 @@
             ],
             "description": "One-Wire (1-wire) devices server & client",
             "support": {
-                "source": "https://github.com/coff/php-w1-server-client/tree/master",
+                "source": "https://github.com/coff/php-w1-server-client/tree/v0.0.4",
                 "issues": "https://github.com/coff/php-w1-server-client/issues"
             },
-            "time": "2017-02-19 23:44:07"
+            "time": "2017-02-25 12:12:12"
         },
         {
             "name": "garoevans/php-enum",
@@ -624,9 +624,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "coff/php-w1-server-client": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

@@ -3,7 +3,8 @@
 namespace Coff\Hellfire\ComponentArray;
 
 use Coff\DataSource\DataSource;
-use Hellfire\Exception\HellfireException;
+use Coff\DataSource\DataSourceInterface;
+use Coff\Hellfire\Exception\HellfireException;
 
 class DataSourceArray extends ComponentArray
 {
@@ -17,7 +18,7 @@ class DataSourceArray extends ComponentArray
      */
     public function offsetSet($offset, $value)
     {
-        if (!$value instanceof DataSource) {
+        if (!$value instanceof DataSourceInterface) {
             throw new HellfireException('DataSource object expected!');
         }
 

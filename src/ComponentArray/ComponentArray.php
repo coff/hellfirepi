@@ -2,7 +2,7 @@
 
 namespace Coff\Hellfire\ComponentArray;
 
-class ComponentArray implements \ArrayAccess
+class ComponentArray implements \ArrayAccess, \Iterator
 {
     protected $components = [];
 
@@ -26,5 +26,23 @@ class ComponentArray implements \ArrayAccess
         unset($this->components[$offset]);
     }
 
+    function rewind() {
+        return reset($this->components);
+    }
 
+    function current() {
+        return current($this->components);
+    }
+
+    function key() {
+        return key($this->components);
+    }
+
+    function next() {
+        return next($this->components);
+    }
+
+    function valid() {
+        return key($this->components) !== null;
+    }
 }

@@ -27,7 +27,7 @@ SQL;
 
     public function __construct(DataSourceArray $array)
     {
-        $this->array;
+        $this->array = $array;
     }
 
     public function setPdo(\PDO $pdo) {
@@ -45,10 +45,13 @@ SQL;
          * @var DataSource $dataSource
          */
         foreach ($this->array as $sourceId => $dataSource) {
-            $statement->execute(array(
+            echo $sourceId . $dataSource->getValue();
+            $result = $statement->execute(array(
                 ':source'   => $sourceId,
-                ':value'    => $dataSource->getValue()
+                ':value'    => (double) $dataSource->getValue()
             ));
+            serialize($result);
+            echo PHP_EOL;
         }
     }
 }

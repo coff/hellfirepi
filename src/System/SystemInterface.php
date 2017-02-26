@@ -1,8 +1,8 @@
 <?php
 
-namespace Coff\Hellfire\Heater;
+namespace Coff\Hellfire\System;
 
-interface ElementInterface
+interface SystemInterface
 {
     public function getState();
 

@@ -3,7 +3,6 @@
 namespace Coff\Hellfire\Command;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -12,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * A command for (re-)creating database storage for HellfirePi
  */
-class CreateStorageCommand extends Command
+class CreateStorageCommand extends HellfireCommand
 {
     /**
      * @var \PDO
@@ -42,7 +41,7 @@ SQL;
 
     public function configure()
     {
-        $this->setName('hellfire:create-storage');
+        $this->setName('create-storage');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
