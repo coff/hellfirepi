@@ -7,6 +7,7 @@ use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
 use Coff\Hellfire\ComponentArray\RelayArray;
 use Coff\Hellfire\Relay\Relay;
 use Coff\Hellfire\Server\HellfireServer;
+use Coff\Hellfire\Servo\AnalogServo;
 use Coff\Hellfire\System\AirIntakeSystem;
 use Coff\Hellfire\System\BoilerSystem;
 use Coff\Hellfire\System\BufferSystem;
@@ -17,11 +18,11 @@ use Coff\OneWire\ClientTransport\XmlW1ClientTransport;
 use Coff\OneWire\Sensor\DS18B20Sensor;
 use Coff\OneWire\Server\W1Server;
 use Coff\OneWire\ServerTransport\XmlW1ServerTransport;
-use Hellfire\Servo\AnalogServo;
 use PiPHP\GPIO\GPIO;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @todo extract configuration parameters into a separate readable config file.
@@ -135,17 +136,23 @@ $container['data-sources-storage'] = function ($c) {
     return $storage;
 };
 
-$container['system:boiler'] = function($c) {
+$container['data-sources:boiler'] = function ($c) {
     $boilerSensors = new DataSourceArray();
     $boilerSensors[BoilerSystem::SENSOR_HIGH] = $c['data-sources:one-wire']['28-0416747d17ff'];
     $boilerSensors[BoilerSystem::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000084a49a8'];
 
+    return $boilerSensors;
+};
+
+$container['system:boiler'] = function($c) {
     $boiler = new BoilerSystem();
     $boiler
+        ->setContainer($c)
+        ->setEventDispatcher($c['event:dispatcher'])
         ->setPump($c['data-sources:relays'][0])
-        ->setExhaustSensor($c['data-sources:all']['max6675:0'])
+        ->setSensorArray($c['data-sources:boiler'])
         ->setAirIntake($c['system:intake'])
-        ->setSensorArray($boilerSensors);
+        ->init();
 
     return $boiler;
 };
@@ -157,8 +164,15 @@ $container['system:heater'] = function ($c) {
 
     $heater = new HeaterSystem();
     $heater
+        ->setContainer($c)
+        ->setEventDispatcher($c['event:dispatcher'])
         ->setPump($c['data-sources:relays'][1])
-        ->setSensorArray($heaterSensors);
+        ->setSensorArray($heaterSensors)
+        ->setRoomTempSensor($c['data-sources:one-wire']['28-00000891595f'])
+        ->setTargetRoomTemp(21, 0.5)
+        ->setBuffer($c['system:buffer'])
+        ->init()
+        ;
 
     return $heater;
 };
@@ -171,24 +185,43 @@ $container['system:buffer'] = function ($c) {
 
     $buffer = new BufferSystem();
     $buffer
-        ->setSensorArray($bufferSensors);
+        ->setContainer($c)
+        ->setEventDispatcher($c['event:dispatcher'])
+        ->setSensorArray($bufferSensors)
+        ->init();
+        ;
 
     return $buffer;
 };
 
-$container['system:intake'] = function() {
-    $servo = new AnalogServo();
+$container['system:intake'] = function($c) {
 
-    /** physical pin 15? */
-    $servo->setGpio(15);
+    /** @var DataSourceArray $boilerSensors */
+    $boilerSensors = $c['data-sources:boiler'];
 
+    $servo = new AnalogServo(800,2440);
+
+    $servo
+        ->setGpio(0) // ServoBlaster configured on PIN 15 but as device 0 internally
+        ->setStepLength(20)
+        ->init(); // sets arm to initial position
 
     $intake = new AirIntakeSystem();
     $intake
+        ->setContainer($c)
+        ->setEventDispatcher($c['event:dispatcher'])
+        ->setExhaustSensor($c['data-sources:all']['max6675:0'])
+        ->setSensorArray($boilerSensors)
         ->setServo($servo)
         ->init()
         ;
+
     return $intake;
 };
+
+$container['event:dispatcher'] = function() {
+    return new EventDispatcher();
+};
+
 
 return $container;

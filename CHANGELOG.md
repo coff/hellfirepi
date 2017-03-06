@@ -2,6 +2,21 @@
 
 ## dev-master
 
+
+Plugged `HellfireServer` cyclic calls to `EventDispatcher`.
+
+Implemented CommonTraits for widely used getters and setters.
+
+Implemented basic events.
+
+Added vendor `symfony/event-dispatcher`.
+
+`AirIntakeTestCommand` added for servo basic testing.
+
+`AirIntakeSystem` further implementation done.
+
+`AnalogServo` rebuild and logic simplified.
+
 Readme updated.
 
 Initial air intake boostrap.

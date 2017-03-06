@@ -48,6 +48,7 @@
         "coff/php-w1-server-client": "~0.0.4",
         "coff/php-spi-mcp3008": "~0.0.3",
         "coff/php-spi-max6675": "~0.0.2",
-        "pimple/pimple": "~3.0"
+        "pimple/pimple": "~3.0",
+        "symfony/event-dispatcher": "^3.2"
     }
 }

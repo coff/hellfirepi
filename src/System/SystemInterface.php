@@ -7,7 +7,4 @@ interface SystemInterface
     public function getState();
 
     public function setState($state);
-
-    public function process();
-
 }

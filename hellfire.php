@@ -4,6 +4,7 @@
 namespace Coff\Hellfire;
 
 use Coff\Hellfire\Application\HellfireApplication;
+use Coff\Hellfire\Command\AirIntakeTestCommand;
 use Coff\Hellfire\Command\FixPermissionsInstallCommand;
 use Coff\Hellfire\Command\HellfireServerCommand;
 use Coff\Hellfire\Command\RelaysTestCommand;
@@ -20,11 +21,17 @@ require (__DIR__ . '/app/bootstrap.php');
 $app = new HellfireApplication('HellfirePi', '0.0.1');
 $app->setContainer($container);
 
+/** Install commands */
 $app->add(new StorageInstallCommand());
-$app->add(new HellfireServerCommand());
-$app->add(new W1ServerCommand());
-$app->add(new RelaysTestCommand());
 $app->add(new FixPermissionsInstallCommand());
+
+/** Server commands */
+$app->add(new W1ServerCommand());
+$app->add(new HellfireServerCommand());
+
+/** Test commands */
+$app->add(new AirIntakeTestCommand());
+$app->add(new RelaysTestCommand());
 
 
 $app->run();

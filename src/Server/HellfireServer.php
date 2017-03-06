@@ -4,6 +4,8 @@ namespace Coff\Hellfire\Server;
 
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
 use Coff\Hellfire\ComponentArray\DataSourceArray;
+use Coff\Hellfire\Event\CyclicEvent;
+use Coff\Hellfire\System\AirIntakeSystem;
 use Coff\Hellfire\System\BoilerSystem;
 use Coff\Hellfire\System\BufferSystem;
 use Coff\Hellfire\System\HeaterSystem;
@@ -33,6 +35,7 @@ class HellfireServer extends Server
 
         $this->addShortCycleCallback('1s', [$this, 'everySecond']);
         $this->addShortCycleCallback('10s', [$this, 'every10s']);
+        $this->addShortCycleCallback('30s', [$this, 'every30s']);
         $this->addShortCycleCallback('1m', [$this, 'every1m']);
     }
 
@@ -43,43 +46,22 @@ class HellfireServer extends Server
     }
 
     public function everySecond() {
-        /**
-         * Since boiler has exhaust temp. sensor it has to be processed
-         * with higher freq.
-         *
-         * @var BoilerSystem $boiler
-         */
-        $boiler = $this->container['system:boiler'];
-        $boiler->process();
+
+        $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_SECOND, new CyclicEvent());
     }
 
     public function every10s() {
-        /** Update DataSources attached to AsyncW1Client */
-        /** @var AsyncW1Client $w1Client */
-        $w1Client = $this->container['client:one-wire'];
-        $w1Client->update();
 
-        /** Then updates Sensors from DataSources */
-        /** @var DataSourceArray $oneWireSensors */
-        $oneWireSensors = $this->container['data-sources:one-wire'];
-        foreach ($oneWireSensors as $sensor) {
-            $sensor->update();
-        }
+        $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_10_SECOND, new CyclicEvent());
+    }
+
+    public function every30s() {
+        $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_30_SECOND, new CyclicEvent());
     }
 
     public function every1m() {
 
-        /**
-         * Every minute should be enough for a buffer and heater system
-         * @var BufferSystem $buffer
-         */
-        $buffer = $this->container['system:buffer'];
-        $buffer->process();
-
-        /** @var HeaterSystem $heater */
-        $heater = $this->container['system:heater'];
-        $heater->process();
-
+        $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_MINUTE, new CyclicEvent());
 
         /**
          * Store sensors readings
@@ -90,4 +72,13 @@ class HellfireServer extends Server
         $this->logger->debug('Stored sensor readings.');
     }
 
+    public function everyNight()
+    {
+        /**
+         * Clean old readings
+         */
+        /** @var DatabaseStorageAdapter $storageAdapter */
+        $storageAdapter = $this->container['data-sources-storage'];
+        $storageAdapter->clean();
+    }
 }

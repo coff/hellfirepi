@@ -1,13 +1,13 @@
 <?php
 
-namespace Hellfire\Servo;
+namespace Coff\Hellfire\Servo;
 
-use Coff\Hellfire\Exception\HellfireException;
+use Coff\DataSource\DataSourceInterface;
 
 /**
- * AnalogServo for analog servo control over servoblaster library
+ * AnalogServo for analog servo control over ServoBlaster library
  */
-class AnalogServo {
+class AnalogServo implements DataSourceInterface {
 
     const
         RANGE_MIN = 0,
@@ -18,17 +18,9 @@ class AnalogServo {
      */
     protected $travelRangeSig;
 
-    protected $travelRangeDeg;
-
-    protected $travelRangeRad;
-
-    protected $armLength=1;
-
     protected $signalTravel;
 
-    protected $linearTravel;
-
-    protected $radialTravel;
+    protected $stepScaling=1;
 
     /**
      * @var int $gpio number servo works on
@@ -36,19 +28,28 @@ class AnalogServo {
     protected $gpio;
 
     protected $signalLength;
-    protected $radialPos;
-    protected $linearPos;
 
     /**
-     * @param int $travelRangeDeg
+     * Step length expressed in signal length.
+     *
+     * @var
+     */
+    protected $stepLength=4;
+
+    /**
      * @param int $signalMin
      * @param int $signalMax
+     * @internal param int $signalMin
      */
-    public function __construct($travelRangeDeg=180, $signalMin=500, $signalMax=2500) {
+    public function __construct($signalMin=500, $signalMax=2500) {
         $this->setTravelRangeSig($signalMin, $signalMax);
-        $this->setTravelRangeDeg(0, $travelRangeDeg);
-        $rad = deg2rad($travelRangeDeg);
-        $this->setTravelRangeRad(0, $rad);
+    }
+
+    public function init()
+    {
+        $this->setRelative(0.5); // start with neutral position?
+
+        return $this;
     }
 
     /**
@@ -59,6 +60,84 @@ class AnalogServo {
         $this->gpio = $gpio;
 
         return $this;
+    }
+
+    public function setStepLength($signalValue) {
+        $this->stepLength = $signalValue;
+
+        return $this;
+    }
+
+    /**
+     * @param float|int $rel
+     * @return $this
+     */
+    public function stepUp($rel=1) {
+        $this->signalLength += $rel * $this->stepLength;
+
+        return $this;
+    }
+
+    /**
+     * @param float|int $rel
+     * @return $this
+     */
+    public function stepDown($rel=1) {
+        $this->signalLength -= $rel * $this->stepLength;
+
+        return $this;
+    }
+
+    public function isMax() {
+        if ($this->signalLength == $this->travelRangeSig[self::RANGE_MAX]) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public function isMin() {
+        if ($this->signalLength == $this->travelRangeSig[self::RANGE_MIN]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets signalLength by relative value 0 to 1
+     * Examples:
+     *  0.5 = 50%
+     *  1   = 100%
+     *
+     * @param double $relative
+     * @return $this
+     */
+    public function setRelative($relative) {
+        $this->signalLength = $this->travelRangeSig[0] + $relative * $this->signalTravel;
+
+        return $this;
+    }
+
+    public function getRelative() {
+        return $this->signalLength - $this->travelRangeSig[0] / $this->signalTravel;
+    }
+
+    public function setStepScaling($scale) {
+        $this->stepScaling = $scale;
+
+        return $this;
+    }
+
+    public function setSignalLength($signalLength) {
+        $this->signalLength = $signalLength;
+
+        return $this;
+    }
+
+    public function getSignalLength() {
+        return $this->signalLength;
     }
 
     /**
@@ -74,83 +153,65 @@ class AnalogServo {
     }
 
     /**
-     * @param $degMin
-     * @param $degMax
-     * @return $this
+     * Sends signal to device.
      */
-    public function setTravelRangeDeg($degMin, $degMax) {
-        $this->travelRangeDeg = [$degMin, $degMax];
+    public function send() {
+        $this->fixLength();
 
-        return $this;
-    }
-
-    /**
-     * @param $radMin
-     * @param $radMax
-     * @return $this
-     */
-    public function setTravelRangeRad($radMin, $radMax) {
-        $this->travelRangeRad = [$radMin, $radMax];
-
-        return $this;
-    }
-
-    /**
-     * @param $armLength
-     * @return $this
-     */
-    public function setArmLength($armLength) {
-        $this->armLength = $armLength;
-
-        $travelRads = $this->travelRangeRad[self::RANGE_MAX] - $this->travelRangeRad[self::RANGE_MIN];
-
-        $this->linearTravel = 2 * $armLength * sin($travelRads / 2);
-        $this->radialTravel = $travelRads * $armLength;
-
-        return $this;
-    }
-
-    /**
-     * @param $linearPos
-     */
-    public function linearMoveTo($linearPos) {
-        $relPos = $linearPos / $this->linearTravel;
-
-        $this->radialPos = $relPos * $this->radialTravel;
-
-        $signalLength = $this->travelRangeSig[self::RANGE_MIN] + $relPos * $this->signalTravel;
-
-        if ($signalLength > $this->travelRangeSig[self::RANGE_MAX]) {
-            $signalLength = $this->travelRangeSig[self::RANGE_MAX];
-        }
-
-
-    }
-
-    /**
-     * Sends signal to device. This is internal method since it doesn't update all position properties.
-     */
-    protected function send() {
+        /*
         if ($this->signalLength < $this->travelRangeSig[self::RANGE_MIN]) {
             throw new HellfireException('Servo signal out of range!');
         }
 
         if ($this->signalLength > $this->travelRangeSig[self::RANGE_MAX]) {
             throw new HellfireException('Servo signal out of range!');
-        }
+        }*/
 
         system('echo "' . $this->gpio . '=' . $this->signalLength . 'us" > /dev/servoblaster');
 
         return $this;
     }
 
+    protected function fixLength() {
+        if ($this->signalLength < $this->travelRangeSig[self::RANGE_MIN]) {
+            $this->signalLength = $this->travelRangeSig[self::RANGE_MIN];
+            return false;
+        }
 
+        if ($this->signalLength > $this->travelRangeSig[self::RANGE_MAX]) {
+            $this->signalLength = $this->travelRangeSig[self::RANGE_MAX];
+            return false;
+        }
 
-    /**
-     * Sets servo arm position in relation to hour 12
-     * @var int $position position in degrees
-     */
-    public function setPositionByDeg($position) {
+        return true;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getSignalTravel()
+    {
+        return $this->signalTravel;
+    }
+
+    /**
+     * This here is just to implement DataSourceInterface
+     * @return int
+     */
+    public function getStamp()
+    {
+        return time();
+    }
+
+    public function getValue()
+    {
+        return $this->signalLength;
+    }
+
+    public function update()
+    {
+        $this->send();
+
+        return $this;
+    }
 }
