@@ -12,12 +12,19 @@ class DatabaseStorageAdapter
      */
     protected $array;
 
-    protected $query = <<< SQL
+    protected $feedQuery = <<< SQL
       INSERT INTO 
         readings (`source`, `value`)
       VALUES 
-        (:source, :value)
 SQL;
+
+    protected $cleanupQuery = <<< SQL
+      DELETE FROM 
+        readings
+      WHERE
+        stamp < now() - interval 1 MONTH 
+SQL;
+
 
 
     /**
@@ -38,20 +45,19 @@ SQL;
 
     public function store() {
 
-        $statement = $this->pdo->prepare($this->query);
-
+        $values = [];
         /**
          * @var string $sourceId
          * @var DataSource $dataSource
          */
         foreach ($this->array as $sourceId => $dataSource) {
-            echo $sourceId . $dataSource->getValue();
-            $result = $statement->execute(array(
-                ':source'   => $sourceId,
-                ':value'    => (double) $dataSource->getValue()
-            ));
-            serialize($result);
-            echo PHP_EOL;
+            $values[] = "('$sourceId',".$dataSource->getValue().")";
         }
+
+        $this->pdo->exec($this->feedQuery . implode(', ', $values));
+    }
+
+    public function clean() {
+        $this->pdo->exec($this->cleanupQuery);
     }
 }
