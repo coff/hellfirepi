@@ -2,6 +2,7 @@
 
 namespace Hellfire;
 
+use Coff\Hellfire\ComponentArray\BoilerSensorArray;
 use Coff\Hellfire\ComponentArray\DataSourceArray;
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
 use Coff\Hellfire\ComponentArray\RelayArray;
@@ -18,6 +19,7 @@ use Coff\OneWire\ClientTransport\XmlW1ClientTransport;
 use Coff\OneWire\Sensor\DS18B20Sensor;
 use Coff\OneWire\Server\W1Server;
 use Coff\OneWire\ServerTransport\XmlW1ServerTransport;
+use Hellfire\Sensor\ExhaustSensor;
 use PiPHP\GPIO\GPIO;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -112,7 +114,7 @@ $container['data-sources:all'] = function ($c) {
         $allDataSources[$key] = $sensor;
     }
 
-    $allDataSources['max6675:0'] = new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000);
+    $allDataSources['max6675:0'] = new ExhaustSensor(new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000));
 
     /** to register intake system's state */
     $allDataSources['intake']    = $c['system:intake'];
@@ -137,9 +139,15 @@ $container['data-sources-storage'] = function ($c) {
 };
 
 $container['data-sources:boiler'] = function ($c) {
-    $boilerSensors = new DataSourceArray();
-    $boilerSensors[BoilerSystem::SENSOR_HIGH] = $c['data-sources:one-wire']['28-0416747d17ff'];
-    $boilerSensors[BoilerSystem::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000084a49a8'];
+    $boilerSensors = new BoilerSensorArray();
+    $boilerSensors[BoilerSensorArray::SENSOR_HIGH] = $c['data-sources:one-wire']['28-0416747d17ff'];
+    $boilerSensors[BoilerSensorArray::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000084a49a8'];
+
+    /** boiler output temp. target  */
+    $boilerSensors->setTargets(BoilerSensorArray::SENSOR_HIGH, 86, 1.5);
+
+    /** boiler input temp. target */
+    $boilerSensors->setTargets(BoilerSensorArray::SENSOR_LOW, 60, 2);
 
     return $boilerSensors;
 };

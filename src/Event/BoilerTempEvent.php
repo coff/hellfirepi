@@ -2,60 +2,31 @@
 
 namespace Coff\Hellfire\Event;
 
+use Coff\Hellfire\ComponentArray\BoilerSensorArray;
+
 class BoilerTempEvent extends Event
 {
     const
-        ON_TOO_HIGH = 'boiler_temp.too_high',
-        ON_TOO_LOW  = 'boiler_temp.too_low';
+        ON_RAISE        = 'boiler_temp.raise',
+        ON_DROP         = 'boiler_temp.drop',
+        ON_TOO_HIGH     = 'boiler_temp.too_high',
+        ON_TARGET       = 'boiler_temp.target',
+        ON_TOO_LOW      = 'boiler_temp.too_low',
+        ON_RANGE_UP     = 'boiler_temp.range_up',
+        ON_RANGE_DOWN   = 'boiler_temp.range_down';
 
-    const
-        RANGE_COLD = 0,
-        RANGE_LOW = 1,
-        RANGE_NORMAL = 2,
-        RANGE_HIGH = 3,
-        RANGE_CRITICAL  = 4;
+    protected $boilerSensorArray;
 
-    protected $percentTarget;
-
-    protected $division;
-
-    protected $range;
-
-    protected $lastTemp;
-
-    public function __construct($currentTemp, $lastTemp, $targetTemp)
+    public function __construct(BoilerSensorArray $array)
     {
-        $this->percentTarget = $currentTemp / $targetTemp * 100;
-
-        switch (true) {
-            case ($currentTemp <= 50):
-                $this->range = self::RANGE_COLD;
-                break;
-            case ($currentTemp <= 70):
-                $this->range = self::RANGE_LOW;
-                break;
-            case ($currentTemp <= 90):
-                $this->range = self::RANGE_NORMAL;
-                break;
-            case ($currentTemp <= 96):
-                $this->range = self::RANGE_HIGH;
-                break;
-            case ($currentTemp > 96):
-                $this->range = self::RANGE_CRITICAL;
-                break;
-        }
-
+        $this->boilerSensorArray = $array;
     }
 
-    public function getLastTemp() {
-        return $this->lastTemp;
-    }
-
-    public function getRange() {
-        return $this->range;
-    }
-
-    public function getPercentTarget() {
-        return $this->percentTarget;
+    /**
+     * @return BoilerSensorArray
+     */
+    public function getBoilerSensorArray()
+    {
+        return $this->boilerSensorArray;
     }
 }

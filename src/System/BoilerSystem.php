@@ -2,7 +2,9 @@
 
 namespace Coff\Hellfire\System;
 
-use Coff\DataSource\DataSource;
+use Coff\Hellfire\ComponentArray\BoilerSensorArray;
+use Coff\Hellfire\Event\BoilerTempEvent;
+use Coff\Hellfire\Event\CyclicEvent;
 
 class BoilerSystem extends System
 {
@@ -10,120 +12,134 @@ class BoilerSystem extends System
     use SensorArrayTrait;
 
     const
-        SENSOR_HIGH         = 'high',
-        SENSOR_LOW          = 'low';
+        STATE_COLD          = 0,
+        STATE_STARTING      = 1,
+        STATE_BURNING       = 2,
+        STATE_COOLING       = 3,
+        STATE_OVERHEAT      = 4;
 
-    const
-        STATE_COLD          = 'cold',
-        STATE_WARMING       = 'warming',
-        STATE_BURNING       = 'burning',
-        STATE_COOLING       = 'cooling',
-        STATE_OVERHEAT      = 'overheat';
+    /** @var  AirIntakeSystem */
+    protected $intake;
 
-
-
-    /**
-     * @var DataSource
-     */
-    protected $exhaustSensor;
+    protected $startStamp;
 
     /**
-     * @var AirIntakeSystem
+     * @var BoilerSensorArray
      */
-    protected $airIntake;
+    protected $sensorArray;
 
-    public function process() {
-        switch ($this->state) {
-            case self::STATE_COLD:
-
-                break;
-
-            case self::STATE_WARMING:
-
-                break;
-
-            case self::STATE_BURNING:
-                break;
-
-            case self::STATE_COOLING:
-                break;
-
-            case self::STATE_OVERHEAT:
-                break;
-        }
-    }
-
-    public function setState($state)
+    public function init()
     {
-        switch ($state) {
-            case self::STATE_COLD:
-                /**
-                 * - open air intake for ventilation
-                 * - disable water-pump
-                 */
+        $this->intake = $this->getContainer()['system:intake'];
 
-                $this->pump->off();
+        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_MINUTE, [$this, ['everyMinute']]);
+      //  $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TOO_HIGH, [$this, ['onOverheat']]);
+      //  $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TARGET, [$this, ['onTempTarget']]);
+     //   $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TOO_HIGH, [$this, ['onTempLow']]);
+        //$this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RAISE, [$this, ['onTempRaise']]);
+       // $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_DROP, [$this, ['onTempDrop']]);
+        $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_UP, [$this, ['onTempRangeUp']]);
+        $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_DOWN, [$this, ['onTempRangeUp']]);
+        return parent::init();
+    }
 
+
+    public function everyMinute(CyclicEvent $event) {
+        $this->sensorArray->update();
+
+        if ($this->sensorArray->isRising(BoilerSensorArray::SENSOR_HIGH)) {
+            $this->getEventDispatcher()
+                ->dispatch(BoilerTempEvent::ON_RAISE, new BoilerTempEvent($this->sensorArray));
+
+            if ($this->sensorArray->isRangeChanged()) {
+                $this->getEventDispatcher()
+                    ->dispatch(BoilerTempEvent::ON_RANGE_UP, new BoilerTempEvent($this->sensorArray));
+            }
+        }
+
+        if ($this->sensorArray->isDropping(BoilerSensorArray::SENSOR_HIGH)) {
+            $this->getEventDispatcher()
+                ->dispatch(BoilerTempEvent::ON_DROP, new BoilerTempEvent($this->sensorArray));
+
+            if ($this->sensorArray->isRangeChanged()) {
+                $this->getEventDispatcher()
+                    ->dispatch(BoilerTempEvent::ON_RANGE_DOWN, new BoilerTempEvent($this->sensorArray));
+            }
+        }
+
+        if ($this->sensorArray->isReadingAboveTarget(BoilerSensorArray::SENSOR_HIGH)) {
+            $this->getEventDispatcher()
+                ->dispatch(BoilerTempEvent::ON_TOO_HIGH, new BoilerTempEvent($this->sensorArray));
+        } elseif ($this->sensorArray->isReadingBelowTarget(BoilerSensorArray::SENSOR_HIGH)) {
+            $this->getEventDispatcher()
+                ->dispatch(BoilerTempEvent::ON_TOO_LOW, new BoilerTempEvent($this->sensorArray));
+        } else {
+            $this->getEventDispatcher()
+                ->dispatch(BoilerTempEvent::ON_TARGET, new BoilerTempEvent($this->sensorArray));
+
+        }
+    }
+
+
+    public function onTempRangeUp(BoilerTempEvent $event) {
+        switch ($this->sensorArray->getRange()) {
+            case BoilerSensorArray::RANGE_LOW:
+                /* STATE_STARTING is only initiated manually */
+                $this->setStartStamp(time());
                 break;
-
-            case self::STATE_WARMING:
-                /**
-                 * - open air intake to provide good airflow
-                 * - enable water-pump
-                 */
-
-                $this->pump->on();
+            case BoilerSensorArray::RANGE_NORMAL:
+                $this->setState(BoilerSystem::STATE_BURNING);
                 break;
-
-            case self::STATE_BURNING:
-                /**
-                 *
-                 */
-
-                // just in case
-                $this->pump->on();
-                break;
-
-            case self::STATE_COOLING:
-                /**
-                 * - disable water-pump to limit heat leakage
-                 */
-
-                $this->pump->off();
-                break;
-
-            case self::STATE_OVERHEAT:
-                /**
-                 * - enable water-pump to get rid of that excess heat
-                 * - fully close air intake
-                 */
-
-                $this->pump->on();
+            case BoilerSensorArray::RANGE_HIGH:
+                // no break
+            case BoilerSensorArray::RANGE_CRITICAL:
+                $this->setState(BoilerSystem::STATE_OVERHEAT);
                 break;
         }
 
-        return parent::setState($state); // TODO: Change the autogenerated stub
+        /* so far anything that happens here causes pump to be on */
+        $this->pump->on();
     }
 
     /**
-     * Sets exhaust gases thermocouple sensor
-     *
-     * @param DataSource $sensor
+     * @param BoilerTempEvent $event
+     */
+    public function onTempRangeDown(BoilerTempEvent $event) {
+        switch ($this->sensorArray->getRange()) {
+            case BoilerSensorArray::RANGE_NORMAL:
+                $this->setState(BoilerSystem::STATE_BURNING);
+                break;
+            case BoilerSensorArray::RANGE_LOW:
+                if (time() - $this->getStartStamp() > 5 * 60 * 60) { // 5 hours
+                    /* we're assuming it only, may also be just a fuel stuck in chamber */
+                    $this->setState(BoilerSystem::STATE_COOLING);
+                }
+                break;
+            case BoilerSensorArray::RANGE_COLD:
+                $this->setState(BoilerSystem::STATE_COLD);
+                $this->pump->off();
+                break;
+
+        }
+    }
+
+    /**
+     * @param mixed $startStamp
      * @return $this
      */
-    public function setExhaustSensor(DataSource $sensor) {
-        $this->exhaustSensor = $sensor;
+    public function setStartStamp($startStamp)
+    {
+        $this->startStamp = $startStamp;
 
         return $this;
     }
 
-    public function setAirIntake(AirIntakeSystem $airIntake) {
-        $this->airIntake = $airIntake;
-
-        return $this;
+    /**
+     * @return mixed
+     */
+    public function getStartStamp()
+    {
+        return $this->startStamp;
     }
 
-    public function getAirIntake() {
-        return $this->airIntake;
-    }
 }

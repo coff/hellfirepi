@@ -2,6 +2,7 @@
 
 ## dev-master
 
+`System` classes rewritten for `EventDispatcher`.
 
 Plugged `HellfireServer` cyclic calls to `EventDispatcher`.
 
