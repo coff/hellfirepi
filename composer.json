@@ -33,6 +33,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/PiPHP/GPIO.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/coff/dashboard.git"
         }
     ],
     "autoload": {
@@ -49,6 +53,7 @@
         "coff/php-spi-mcp3008": "~0.0.3",
         "coff/php-spi-max6675": "~0.0.2",
         "pimple/pimple": "~3.0",
-        "symfony/event-dispatcher": "^3.2"
+        "symfony/event-dispatcher": "^3.2",
+        "casadatos/dashboard": "^0.0.2"
     }
 }

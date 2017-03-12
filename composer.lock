@@ -4,9 +4,39 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b3d7923f86680bd2c2375e87ea506517",
-    "content-hash": "ae6d52baa63b0a13fd69e6557b623933",
+    "hash": "608ac3a7a2f0090a8020b220e66fa16a",
+    "content-hash": "321d19493925f07be65d7deb6f185ffa",
     "packages": [
+        {
+            "name": "casadatos/dashboard",
+            "version": "v0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coff/dashboard.git",
+                "reference": "0019de5515d654764eff9f4910bc57d1f455c20d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coff/dashboard/zipball/0019de5515d654764eff9f4910bc57d1f455c20d",
+                "reference": "0019de5515d654764eff9f4910bc57d1f455c20d",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Casadatos\\Component\\Dashboard\\": "src/",
+                    "Casadatos\\Component\\Dashboard\\Tests\\": "tests/"
+                }
+            },
+            "support": {
+                "source": "https://github.com/coff/dashboard/tree/v0.0.2",
+                "issues": "https://github.com/coff/dashboard/issues"
+            },
+            "time": "2017-03-11 15:01:41"
+        },
         {
             "name": "coff/php-api-datasource",
             "version": "v0.0.4",

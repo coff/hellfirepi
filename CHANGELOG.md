@@ -2,6 +2,8 @@
 
 ## dev-master
 
+Multiple changes and fixes. First alfa-state reached.
+
 `System` classes rewritten for `EventDispatcher`.
 
 Plugged `HellfireServer` cyclic calls to `EventDispatcher`.

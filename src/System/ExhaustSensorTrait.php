@@ -2,29 +2,29 @@
 
 namespace Coff\Hellfire\System;
 
-use Coff\DataSource\DataSource;
+use Coff\Hellfire\Sensor\ExhaustSensor;
 
 trait ExhaustSensorTrait
 {
     /**
-     * @var DataSource
+     * @var ExhaustSensor
      */
     protected $exhaust;
 
     /**
      * Sets exhaust gases thermocouple sensor
      *
-     * @param DataSource $sensor
+     * @param ExhaustSensor $sensor
      * @return $this
      */
-    public function setExhaustSensor(DataSource $sensor) {
+    public function setExhaustSensor(ExhaustSensor $sensor) {
         $this->exhaust = $sensor;
 
         return $this;
     }
 
     /**
-     * @return DataSource
+     * @return ExhaustSensor
      */
     public function getExhaustSensor() {
         return $this->exhaust;

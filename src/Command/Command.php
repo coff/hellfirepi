@@ -12,6 +12,8 @@ use Pimple\Container;
  */
 abstract class Command extends \Symfony\Component\Console\Command\Command
 {
+    protected $logFilename = 'hellfire-common.log';
+
     /**
      * Returns pimple DI container
      *
@@ -22,5 +24,9 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
         $app = $this->getApplication();
 
         return $app->getContainer();
+    }
+
+    public function getLogFilename() {
+        return $this->logFilename;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Coff\Hellfire\System;
 
+use Casadatos\Component\Dashboard\ConsoleDashboard;
+use Casadatos\Component\Dashboard\Gauge\ValueGauge;
 use Coff\Hellfire\ComponentArray\BoilerSensorArray;
 use Coff\Hellfire\Event\BoilerTempEvent;
 use Coff\Hellfire\Event\CyclicEvent;
@@ -10,16 +12,15 @@ class BoilerSystem extends System
 {
     use PumpTrait;
     use SensorArrayTrait;
+    use DashboardTrait;
 
     const
-        STATE_COLD          = 0,
-        STATE_STARTING      = 1,
-        STATE_BURNING       = 2,
-        STATE_COOLING       = 3,
-        STATE_OVERHEAT      = 4;
+        STATE_COLD          = 'cold',
+        STATE_STARTING      = 'starting',
+        STATE_BURNING       = 'burning',
+        STATE_COOLING       = 'cooling',
+        STATE_OVERHEAT      = 'overheat';
 
-    /** @var  AirIntakeSystem */
-    protected $intake;
 
     protected $startStamp;
 
@@ -30,21 +31,21 @@ class BoilerSystem extends System
 
     public function init()
     {
-        $this->intake = $this->getContainer()['system:intake'];
 
-        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_MINUTE, [$this, ['everyMinute']]);
-      //  $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TOO_HIGH, [$this, ['onOverheat']]);
-      //  $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TARGET, [$this, ['onTempTarget']]);
-     //   $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TOO_HIGH, [$this, ['onTempLow']]);
-        //$this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RAISE, [$this, ['onTempRaise']]);
-       // $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_DROP, [$this, ['onTempDrop']]);
-        $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_UP, [$this, ['onTempRangeUp']]);
-        $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_DOWN, [$this, ['onTempRangeUp']]);
+        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_MINUTE, [$this, 'everyMinute']);
+        $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_UP, [$this, 'onTempRangeUp']);
+        $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_DOWN, [$this, 'onTempRangeDown']);
+
+        $this->getDashboard()
+            ->add('BoilP', new ValueGauge(5))
+            ->add('BoilHi', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTRED)
+            ->add('BoilLo', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTBLUE)
+            ->add('BoilrState', new ValueGauge(10))
+            ;
         return parent::init();
     }
 
-
-    public function everyMinute(CyclicEvent $event) {
+    public function update() {
         $this->sensorArray->update();
 
         if ($this->sensorArray->isRising(BoilerSensorArray::SENSOR_HIGH)) {
@@ -78,6 +79,18 @@ class BoilerSystem extends System
                 ->dispatch(BoilerTempEvent::ON_TARGET, new BoilerTempEvent($this->sensorArray));
 
         }
+
+        $this->getDashboard()
+            ->update('BoilP', $this->pump->isOn() ? 'ON' : 'OFF')
+            ->update('BoilHi', sprintf("%.1f", $this->sensorArray->getReading(BoilerSensorArray::SENSOR_HIGH)))
+            ->update('BoilLo', sprintf("%.1f", $this->sensorArray->getReading(BoilerSensorArray::SENSOR_LOW)))
+            ->update('BoilrState', $this->getState())
+        ;
+    }
+
+
+    public function everyMinute(CyclicEvent $event) {
+        $this->update();
     }
 
 

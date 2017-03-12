@@ -115,13 +115,13 @@ class AnalogServo implements DataSourceInterface {
      * @return $this
      */
     public function setRelative($relative) {
-        $this->signalLength = $this->travelRangeSig[0] + $relative * $this->signalTravel;
+        $this->signalLength = $this->travelRangeSig[self::RANGE_MIN] + $relative * $this->signalTravel;
 
         return $this;
     }
 
     public function getRelative() {
-        return $this->signalLength - $this->travelRangeSig[0] / $this->signalTravel;
+        return ($this->signalLength - $this->travelRangeSig[self::RANGE_MIN]) / $this->signalTravel;
     }
 
     public function setStepScaling($scale) {

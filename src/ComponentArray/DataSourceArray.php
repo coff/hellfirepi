@@ -26,7 +26,7 @@ class DataSourceArray extends ComponentArray
     }
 
     /**
-     * Performs internal readings update. It does not update DataSources'
+     * Performs internal readings update.
      * data.
      */
     public function update() {
@@ -36,10 +36,22 @@ class DataSourceArray extends ComponentArray
          * @var DataSource $component
          */
         foreach ($this->components as $index => $component) {
+            $component->update();
             $this->readings[(string)$index] = $component->getValue();
         }
 
         return $this;
+    }
+
+    /**
+     * Returns readings for all sensors in array
+     *
+     * @param string|int $sensorId
+     * @return mixed
+     */
+    public function getReading($sensorId)
+    {
+        return $this->readings[$sensorId];
     }
 
     /**

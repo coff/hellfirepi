@@ -2,10 +2,15 @@
 
 namespace Hellfire;
 
+use Casadatos\Component\Dashboard\ConsoleDashboard;
+use Coff\Hellfire\Command\Command;
 use Coff\Hellfire\ComponentArray\BoilerSensorArray;
+use Coff\Hellfire\ComponentArray\BufferSensorArray;
 use Coff\Hellfire\ComponentArray\DataSourceArray;
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
+use Coff\Hellfire\ComponentArray\HeaterSensorArray;
 use Coff\Hellfire\ComponentArray\RelayArray;
+use Coff\Hellfire\EventDispatcher;
 use Coff\Hellfire\Relay\Relay;
 use Coff\Hellfire\Server\HellfireServer;
 use Coff\Hellfire\Servo\AnalogServo;
@@ -19,20 +24,34 @@ use Coff\OneWire\ClientTransport\XmlW1ClientTransport;
 use Coff\OneWire\Sensor\DS18B20Sensor;
 use Coff\OneWire\Server\W1Server;
 use Coff\OneWire\ServerTransport\XmlW1ServerTransport;
-use Hellfire\Sensor\ExhaustSensor;
+use Coff\Hellfire\Sensor\ExhaustSensor;
+use Monolog\Logger;
 use PiPHP\GPIO\GPIO;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Output\StreamOutput;
 
-/**
+/*
  * @todo extract configuration parameters into a separate readable config file.
  */
 
-$container['logger'] = function () {
-    $logger = new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG, $isDecorated=true, new OutputFormatter()));
+$container['logger'] = function ($c) {
+
+    /** @var Command $command  */
+    $command = $c['running_command'];
+
+    /* each command should tell us its logfile name */
+    $res = fopen('../' . $command->getLogFilename(), 'a');
+    $output = new StreamOutput($res, StreamOutput::VERBOSITY_DEBUG, $isDecorated=true, new OutputFormatter());
+    $logger = new ConsoleLogger($output);
+    $logger->info('Logger initialized');
     return $logger;
+};
+
+$container['dashboard'] = function() {
+    /** @todo use NullDashboard when in deamon mode! */
+    return new ConsoleDashboard();
 };
 
 $container['pdo'] = function () {
@@ -49,7 +68,17 @@ $container['client:one-wire'] = function($c) {
 };
 
 $container['server:one-wire'] = function($c) {
-    $server = new W1Server('unix:///tmp/w1server.socket');
+    $socketPath = '/tmp/w1server.socket';
+
+    /** @var InputInterface $input */
+    $input = $c['interface:input'];
+
+    if ($input->hasOption('socket-override') && file_exists($socketPath)) {
+        unlink($socketPath);
+    }
+
+    $server = new W1Server('unix://' . $socketPath);
+
     $server->setLogger($c['logger']);
     $server->setTransport(new XmlW1ServerTransport());
     $server->init();
@@ -57,9 +86,20 @@ $container['server:one-wire'] = function($c) {
 };
 
 $container['server:hellfire'] = function ($c) {
-    $server = new HellfireServer('unix:///tmp/hellfire.socket');
+
+    $socketPath = '/tmp/hellfire.socket';
+
+    /** @var InputInterface $input */
+    $input = $c['interface:input'];
+
+    if ($input->hasOption('socket-override') && file_exists($socketPath)) {
+        unlink($socketPath);
+    }
+
+    $server = new HellfireServer('unix://' . $socketPath);
     $server->setLogger($c['logger']);
     $server->setContainer($c);
+    $server->setEventDispatcher($c['event:dispatcher']);
     $server->init();
     return $server;
 };
@@ -86,6 +126,8 @@ $container['data-sources:relays'] = function($c) {
         $relay->init();
     }
 
+    $relays[7]->on(); // self-powering
+
     return $relays;
 };
 
@@ -96,8 +138,14 @@ $container['data-sources:one-wire'] = function($c) {
 
     $w1DataSources = new DataSourceArray();
 
-    $w1Sensors = array ('28-0000084a49a8', '28-0000084b947a',
-        '28-00000891595f', '28-0000088fc71c', '28-0416747d17ff');
+    $w1Sensors = array (
+        '28-0000084a49a8',
+        '28-0000084b947a',
+        '28-00000891595f',
+        '28-0000088fc71c',
+        '28-0416747d17ff',
+        '28-051685dc73ff',
+        '28-0316848610ff');
 
     foreach ($w1Sensors as $sensorId) {
         $ds = $w1Client->createDataSourceById($sensorId);
@@ -114,10 +162,9 @@ $container['data-sources:all'] = function ($c) {
         $allDataSources[$key] = $sensor;
     }
 
-    $allDataSources['max6675:0'] = new ExhaustSensor(new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000));
+    $allDataSources['max6675:0'] = $thermocouple = new ExhaustSensor(new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000));
 
-    /** to register intake system's state */
-    $allDataSources['intake']    = $c['system:intake'];
+    $thermocouple->init();
 
     /**
      * Relays state's are to be register too
@@ -154,12 +201,14 @@ $container['data-sources:boiler'] = function ($c) {
 
 $container['system:boiler'] = function($c) {
     $boiler = new BoilerSystem();
+
+    $boiler->setLogger($c['logger']);
     $boiler
         ->setContainer($c)
+        ->setDashboard($c['dashboard'])
         ->setEventDispatcher($c['event:dispatcher'])
         ->setPump($c['data-sources:relays'][0])
         ->setSensorArray($c['data-sources:boiler'])
-        ->setAirIntake($c['system:intake'])
         ->init();
 
     return $boiler;
@@ -167,18 +216,19 @@ $container['system:boiler'] = function($c) {
 
 $container['system:heater'] = function ($c) {
     $heaterSensors = new DataSourceArray();
-    $heaterSensors[HeaterSystem::SENSOR_HIGH] = $c['data-sources:one-wire']['28-00000891595f'];
-    $heaterSensors[HeaterSystem::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000088fc71c'];
+    $heaterSensors[HeaterSensorArray::SENSOR_HIGH] = $c['data-sources:one-wire']['28-051685dc73ff'];
+    $heaterSensors[HeaterSensorArray::SENSOR_LOW] = $c['data-sources:one-wire']['28-0316848610ff'];
 
     $heater = new HeaterSystem();
+    $heater->setLogger($c['logger']);
     $heater
         ->setContainer($c)
+        ->setDashboard($c['dashboard'])
         ->setEventDispatcher($c['event:dispatcher'])
         ->setPump($c['data-sources:relays'][1])
         ->setSensorArray($heaterSensors)
         ->setRoomTempSensor($c['data-sources:one-wire']['28-00000891595f'])
         ->setTargetRoomTemp(21, 0.5)
-        ->setBuffer($c['system:buffer'])
         ->init()
         ;
 
@@ -186,14 +236,18 @@ $container['system:heater'] = function ($c) {
 };
 
 $container['system:buffer'] = function ($c) {
-    $bufferSensors = new DataSourceArray();
+    $bufferSensors = new BufferSensorArray();
+    $bufferSensors->setCapacity(800);
+
     // @todo install high sensor on buffer tank
-    //$bufferSensors[BufferSystem::SENSOR_HIGH] = $c['data-sources:one-wire'][''];
-    $bufferSensors[BufferSystem::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000084b947a'];
+    $bufferSensors[BufferSensorArray::SENSOR_HIGH] = $c['data-sources:one-wire']['28-0000088fc71c'];
+    $bufferSensors[BufferSensorArray::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000084b947a'];
 
     $buffer = new BufferSystem();
+    $buffer->setLogger($c['logger']);
     $buffer
         ->setContainer($c)
+        ->setDashboard($c['dashboard'])
         ->setEventDispatcher($c['event:dispatcher'])
         ->setSensorArray($bufferSensors)
         ->init();
@@ -207,16 +261,25 @@ $container['system:intake'] = function($c) {
     /** @var DataSourceArray $boilerSensors */
     $boilerSensors = $c['data-sources:boiler'];
 
+    /** @var Logger $logger */
+    $logger = $c['logger'];
+
     $servo = new AnalogServo(800,2440);
+
+    $logger->info('Initializing servo...');
 
     $servo
         ->setGpio(0) // ServoBlaster configured on PIN 15 but as device 0 internally
         ->setStepLength(20)
         ->init(); // sets arm to initial position
 
+    $logger->info('Servo initialized.');
+
     $intake = new AirIntakeSystem();
+    $intake->setLogger($logger);
     $intake
         ->setContainer($c)
+        ->setDashboard($c['dashboard'])
         ->setEventDispatcher($c['event:dispatcher'])
         ->setExhaustSensor($c['data-sources:all']['max6675:0'])
         ->setSensorArray($boilerSensors)
@@ -224,11 +287,19 @@ $container['system:intake'] = function($c) {
         ->init()
         ;
 
+    /** @var DataSourceArray $dataSourcesAll */
+    $dataSourcesAll = $c['data-sources:all'];
+
+    /** to register intake system's state */
+    $dataSourcesAll['intake']    = $intake;
+
     return $intake;
 };
 
-$container['event:dispatcher'] = function() {
-    return new EventDispatcher();
+$container['event:dispatcher'] = function($c) {
+    $eventDispatcher = new EventDispatcher();
+    $eventDispatcher->setLogger($c['logger']);
+    return $eventDispatcher;
 };
 
 

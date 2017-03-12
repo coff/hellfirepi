@@ -2,12 +2,16 @@
 
 namespace Coff\Hellfire\System;
 
+use Casadatos\Component\Dashboard\ConsoleDashboard;
+use Casadatos\Component\Dashboard\Gauge\PercentGauge;
+use Casadatos\Component\Dashboard\Gauge\ValueGauge;
+use Coff\DataSource\Exception\DataSourceException;
 use Coff\Hellfire\ComponentArray\BoilerSensorArray;
 use Coff\Hellfire\Event\BoilerTempEvent;
 use Coff\Hellfire\Event\CyclicEvent;
 use Coff\Hellfire\Event\ExhaustTempEvent;
 use Coff\Hellfire\Servo\AnalogServo;
-use Hellfire\Sensor\ExhaustSensor;
+use Coff\Hellfire\Sensor\ExhaustSensor;
 
 /**
  * AirIntakeSystem
@@ -18,11 +22,12 @@ class AirIntakeSystem extends System
 {
     use SensorArrayTrait;
     use ExhaustSensorTrait;
+    use DashboardTrait;
 
     const
-        STATE_OPEN           = 1,
-        STATE_TEMP_DRIVEN    = 2,
-        STATE_CLOSED         = 0;
+        STATE_OPEN           = 'open',
+        STATE_TEMP_DRIVEN    = 'tmp_driven',
+        STATE_CLOSED         = 'closed';
 
     protected $targetExhaustTemp=170;
     protected $targetExhaustTempHysteresis=5;
@@ -40,10 +45,12 @@ class AirIntakeSystem extends System
      */
     protected $servo;
 
+    protected $thermocoupleBroken=false;
+
     public function init()
     {
-        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_SECOND,
-            [$this, 'everySecond']);
+        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_3_SECOND,
+            [$this, 'every3s']);
         $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TOO_HIGH,
             [$this, 'onBoilerTooHigh']);
         $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_TOO_LOW,
@@ -53,6 +60,12 @@ class AirIntakeSystem extends System
         $this->getEventDispatcher()->addListener(ExhaustTempEvent::ON_TOO_LOW,
             [$this, 'onExhaustTooLow']);
 
+        $this->getDashboard()
+            ->add('Intk', new PercentGauge(4))
+            ->add('Exhst', new ValueGauge(5))
+            ->add('IntkState', new ValueGauge(10))
+        ;
+
         $this->open();
 
         $this->setState(self::STATE_TEMP_DRIVEN);
@@ -60,22 +73,44 @@ class AirIntakeSystem extends System
         return parent::init();
     }
 
+    public function update()
+    {
+        if ($this->thermocoupleBroken === false) {
+            try {
+                $this->exhaust->update();
+                $this->lastExhaustTemp = $this->exhaustTemp;
+                $this->exhaustTemp = $this->exhaust->getValue();
+
+                if ($this->exhaustTemp > $this->targetExhaustTemp + $this->targetExhaustTempHysteresis) {
+                    $this->getEventDispatcher()
+                        ->dispatch(ExhaustTempEvent::ON_TOO_HIGH, new ExhaustTempEvent());
+                } elseif ($this->exhaustTemp < $this->targetExhaustTemp - $this->targetExhaustTempHysteresis) {
+                    $this->getEventDispatcher()
+                        ->dispatch(ExhaustTempEvent::ON_TOO_LOW, new ExhaustTempEvent());
+                }
+            } catch (DataSourceException $e) {
+                $this->thermocoupleBroken = true;
+                /* @todo some logging aggregation needed! */
+
+                /* Thermocouple is open? Fuck thermocouple! */
+                $this->logger->alert($e->getMessage());
+            }
+        }
+
+        $this->getDashboard()
+            ->update('Intk', $this->getServo()->getRelative() * 100)
+            ->update('Exhst', sprintf("%d", $this->exhaustTemp))
+            ->update('IntkState', $this->getState())
+            ;
+
+
+    }
+
     /**
      * @param CyclicEvent $event
      */
-    public function everySecond(CyclicEvent $event) {
-        $this->exhaust->update();
-        $this->lastExhaustTemp = $this->exhaustTemp;
-        $this->exhaustTemp = $this->exhaust->getValue();
-
-        if ($this->exhaustTemp > $this->targetExhaustTemp + $this->targetExhaustTempHysteresis) {
-            $this->getEventDispatcher()
-                ->dispatch(ExhaustTempEvent::ON_TOO_HIGH, new ExhaustTempEvent());
-        } elseif ($this->exhaustTemp < $this->targetExhaustTemp - $this->targetExhaustTempHysteresis) {
-            $this->getEventDispatcher()
-                ->dispatch(ExhaustTempEvent::ON_TOO_LOW, new ExhaustTempEvent());
-        }
-
+    public function every3s(CyclicEvent $event) {
+        $this->update();
     }
 
     public function onBoilerTooHigh(BoilerTempEvent $event) {
@@ -249,6 +284,7 @@ class AirIntakeSystem extends System
      * Fully closes air intake valve
      */
     public function close() {
+        $this->logger->info('Shutter closed');
         $this->servo
             ->setRelative(0)
             ->send();
@@ -258,6 +294,7 @@ class AirIntakeSystem extends System
      * Fully opens air intake valve
      */
     public function open() {
+        $this->logger->info('Shutter opened');
         $this->servo
             ->setRelative(1)
             ->send();
