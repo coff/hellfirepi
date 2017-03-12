@@ -92,6 +92,11 @@ class BufferSensorArray extends DataSourceArray
     }
 
     public function getPowerFillPercent() {
+
+        if ($this->getPowerCapacity() == 0) {
+            return 0;
+        }
+
         return $this->getPowerFill() / $this->getPowerCapacity() * 100;
     }
 

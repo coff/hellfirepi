@@ -21,7 +21,8 @@ class BufferSystem extends System
         STATE_FULL           = 'full';
 
     public function init() {
-        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_2_MINUTE, [$this, 'every2Minute']);
+        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_3_SECOND, [$this, 'every3rdSecond']);
+        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_2_MINUTE, [$this, 'every2ndMinute']);
 
         $this->getDashboard()
             ->add('Fill', new PercentGauge(4))
@@ -73,14 +74,21 @@ class BufferSystem extends System
             }
         }
 
-        $this->getDashboard()
-            ->update('Fill', sprintf("%d", $fill))
-            ->update('BuffHi', sprintf("%.1f", $this->sensorArray->getReading(BufferSensorArray::SENSOR_HIGH)))
-            ->update('BuffLo', sprintf("%.1f", $this->sensorArray->getReading(BufferSensorArray::SENSOR_LOW)))
-        ;
     }
 
-    public function every2Minute(CyclicEvent $event) {
+    public function every3rdSecond(CyclicEvent $event) {
+        /** @var BufferSensorArray $sensorArray */
+        $sensorArray = $this->getSensorArray();
+
+        $this->getDashboard()
+            ->update('Fill', sprintf("%d", $sensorArray->getPowerFillPercent()))
+            ->update('BuffHi', sprintf("%.1f", $sensorArray->getReading(BufferSensorArray::SENSOR_HIGH)))
+            ->update('BuffLo', sprintf("%.1f", $sensorArray->getReading(BufferSensorArray::SENSOR_LOW)))
+        ;
+
+    }
+
+    public function every2ndMinute(CyclicEvent $event) {
         $this->update();
     }
 }

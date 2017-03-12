@@ -54,7 +54,7 @@ class HeaterSystem extends System
             ->add('HeatHi', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTRED)
             ->add('HeatLo', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTBLUE)
             ->add('RoomT', new ValueGauge(5))
-            ->add('HeatgState', new ValueGauge(10))
+            ->add('HeatgState', new ValueGauge(10), null, ConsoleDashboard::COL_FG_WHITE)
             ;
 
         return parent::init();

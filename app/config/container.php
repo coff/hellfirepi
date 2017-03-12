@@ -22,6 +22,7 @@ use Coff\Max6675\Max6675DataSource;
 use Coff\OneWire\Client\AsyncW1Client;
 use Coff\OneWire\ClientTransport\XmlW1ClientTransport;
 use Coff\OneWire\Sensor\DS18B20Sensor;
+use Coff\OneWire\Sensor\Sensor;
 use Coff\OneWire\Server\W1Server;
 use Coff\OneWire\ServerTransport\XmlW1ServerTransport;
 use Coff\Hellfire\Sensor\ExhaustSensor;
@@ -187,8 +188,18 @@ $container['data-sources-storage'] = function ($c) {
 
 $container['data-sources:boiler'] = function ($c) {
     $boilerSensors = new BoilerSensorArray();
-    $boilerSensors[BoilerSensorArray::SENSOR_HIGH] = $c['data-sources:one-wire']['28-0416747d17ff'];
-    $boilerSensors[BoilerSensorArray::SENSOR_LOW] = $c['data-sources:one-wire']['28-0000084a49a8'];
+
+    /** @var Sensor $high */
+    $boilerSensors[BoilerSensorArray::SENSOR_HIGH] = $high = $c['data-sources:one-wire']['28-0416747d17ff'];
+
+    /** @var Sensor $low */
+    $boilerSensors[BoilerSensorArray::SENSOR_LOW] = $low = $c['data-sources:one-wire']['28-0000084a49a8'];
+
+    /**
+     * Needs correction perhaps due to poor sensor installation.
+     */
+    $high->setCorrection(6);
+    $low->setCorrection(6);
 
     /** boiler output temp. target  */
     $boilerSensors->setTargets(BoilerSensorArray::SENSOR_HIGH, 86, 1.5);
@@ -216,8 +227,19 @@ $container['system:boiler'] = function($c) {
 
 $container['system:heater'] = function ($c) {
     $heaterSensors = new DataSourceArray();
-    $heaterSensors[HeaterSensorArray::SENSOR_HIGH] = $c['data-sources:one-wire']['28-051685dc73ff'];
-    $heaterSensors[HeaterSensorArray::SENSOR_LOW] = $c['data-sources:one-wire']['28-0316848610ff'];
+
+    /** @var Sensor $high */
+    $heaterSensors[HeaterSensorArray::SENSOR_HIGH] = $high = $c['data-sources:one-wire']['28-051685dc73ff'];
+
+    /** @var Sensor $low */
+    $heaterSensors[HeaterSensorArray::SENSOR_LOW] = $low = $c['data-sources:one-wire']['28-0316848610ff'];
+
+    /**
+     * Needs correction perhaps due to poor sensor installation.
+     */
+    $high->setCorrection(6);
+    $low->setCorrection(6);
+
 
     $heater = new HeaterSystem();
     $heater->setLogger($c['logger']);

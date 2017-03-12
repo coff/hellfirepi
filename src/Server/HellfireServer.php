@@ -4,12 +4,7 @@ namespace Coff\Hellfire\Server;
 
 use Casadatos\Component\Dashboard\Dashboard;
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
-use Coff\Hellfire\ComponentArray\DataSourceArray;
 use Coff\Hellfire\Event\CyclicEvent;
-use Coff\Hellfire\System\AirIntakeSystem;
-use Coff\Hellfire\System\BoilerSystem;
-use Coff\Hellfire\System\BufferSystem;
-use Coff\Hellfire\System\HeaterSystem;
 use Coff\OneWire\Client\AsyncW1Client;
 
 class HellfireServer extends Server
@@ -74,15 +69,15 @@ class HellfireServer extends Server
 
     public function every30s() {
         $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_30_SECOND, new CyclicEvent());
+
+        /** @var Dashboard $dashboard */
+        $dashboard = $this->getContainer()['dashboard'];
+        $dashboard->snap();
     }
 
     public function every1m() {
 
         $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_MINUTE, new CyclicEvent());
-
-        /** @var Dashboard $dashboard */
-        $dashboard = $this->getContainer()['dashboard'];
-        $dashboard->snap();
 
         /**
          * Store sensors readings

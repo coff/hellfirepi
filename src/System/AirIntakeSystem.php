@@ -63,7 +63,7 @@ class AirIntakeSystem extends System
         $this->getDashboard()
             ->add('Intk', new PercentGauge(4))
             ->add('Exhst', new ValueGauge(5))
-            ->add('IntkState', new ValueGauge(10))
+            ->add('IntkState', new ValueGauge(10), null, ConsoleDashboard::COL_FG_WHITE)
         ;
 
         $this->open();
@@ -98,7 +98,7 @@ class AirIntakeSystem extends System
         }
 
         $this->getDashboard()
-            ->update('Intk', $this->getServo()->getRelative() * 100)
+            ->update('Intk', sprintf("%d", $this->getServo()->getRelative() * 100))
             ->update('Exhst', sprintf("%d", $this->exhaustTemp))
             ->update('IntkState', $this->getState())
             ;

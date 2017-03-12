@@ -31,7 +31,7 @@ class BoilerSystem extends System
 
     public function init()
     {
-
+        $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_3_SECOND, [$this, 'every3rdSecond']);
         $this->getEventDispatcher()->addListener(CyclicEvent::EVERY_MINUTE, [$this, 'everyMinute']);
         $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_UP, [$this, 'onTempRangeUp']);
         $this->getEventDispatcher()->addListener(BoilerTempEvent::ON_RANGE_DOWN, [$this, 'onTempRangeDown']);
@@ -40,7 +40,7 @@ class BoilerSystem extends System
             ->add('BoilP', new ValueGauge(5))
             ->add('BoilHi', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTRED)
             ->add('BoilLo', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTBLUE)
-            ->add('BoilrState', new ValueGauge(10))
+            ->add('BoilrState', new ValueGauge(10), null, ConsoleDashboard::COL_FG_WHITE)
             ;
         return parent::init();
     }
@@ -79,7 +79,9 @@ class BoilerSystem extends System
                 ->dispatch(BoilerTempEvent::ON_TARGET, new BoilerTempEvent($this->sensorArray));
 
         }
+    }
 
+    public function every3rdSecond(CyclicEvent $event) {
         $this->getDashboard()
             ->update('BoilP', $this->pump->isOn() ? 'ON' : 'OFF')
             ->update('BoilHi', sprintf("%.1f", $this->sensorArray->getReading(BoilerSensorArray::SENSOR_HIGH)))

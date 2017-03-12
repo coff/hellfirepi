@@ -2,6 +2,8 @@
 
 ## dev-master
 
+Implemented linear correction for sensors.
+
 Multiple changes and fixes. First alfa-state reached.
 
 `System` classes rewritten for `EventDispatcher`.
