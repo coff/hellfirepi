@@ -4,7 +4,9 @@
 namespace Coff\Hellfire;
 
 use Coff\Hellfire\Application\HellfireApplication;
+use Coff\Hellfire\Command\AirIntakeCalibrateCommand;
 use Coff\Hellfire\Command\AirIntakeTestCommand;
+use Coff\Hellfire\Command\BuzzerTestCommand;
 use Coff\Hellfire\Command\FixPermissionsInstallCommand;
 use Coff\Hellfire\Command\HellfireServerCommand;
 use Coff\Hellfire\Command\RelaysTestCommand;
@@ -32,6 +34,10 @@ $app->add(new HellfireServerCommand());
 /** Test commands */
 $app->add(new AirIntakeTestCommand());
 $app->add(new RelaysTestCommand());
+$app->add(new BuzzerTestCommand());
+
+/** Calibration commands */
+$app->add(new AirIntakeCalibrateCommand());
 
 
 $app->run();

@@ -26,6 +26,7 @@ class BufferSystem extends System
 
         $this->getDashboard()
             ->add('Fill', new PercentGauge(4))
+            ->add('KWh', new ValueGauge(3))
             ->add('BuffHi', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTRED)
             ->add('BuffLo', new ValueGauge(6), null, ConsoleDashboard::COL_FG_LIGHTBLUE)
             ;
@@ -42,13 +43,13 @@ class BufferSystem extends System
 
         if ($sensorArray->isPowerFillRising()) {
             switch (true) {
-                case $fill > 95:
+                case $fill > 80:
                     $eventType = BufferEvent::ON_FILLING_FULL;
                     break;
-                case $fill > 80:
+                case $fill > 70:
                     $eventType = BufferEvent::ON_FILLING_NEAR_FULL;
                     break;
-                case $fill > 5:
+                case $fill > 0:
                     $eventType = BufferEvent::ON_FILLING_NOT_EMPTY;
                     break;
             }
@@ -58,7 +59,7 @@ class BufferSystem extends System
 
         } elseif ($sensorArray->isPowerFillDropping()) {
             switch (true) {
-                case $fill < 5:
+                case $fill < 1:
                     $eventType = BufferEvent::ON_DROPPING_EMPTY;
                     break;
                 case $fill < 20:
@@ -82,6 +83,7 @@ class BufferSystem extends System
 
         $this->getDashboard()
             ->update('Fill', sprintf("%d", $sensorArray->getPowerFillPercent()))
+            ->update('KWh', sprintf("%d", $sensorArray->getPowerFill()))
             ->update('BuffHi', sprintf("%.1f", $sensorArray->getReading(BufferSensorArray::SENSOR_HIGH)))
             ->update('BuffLo', sprintf("%.1f", $sensorArray->getReading(BufferSensorArray::SENSOR_LOW)))
         ;

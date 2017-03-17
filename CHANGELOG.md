@@ -2,9 +2,21 @@
 
 ## dev-master
 
+Introduced `FailoverAirIntakeSystem` for handling intake shutter when 
+thermocouple fails to get readings (automatic switch is yet to be implemented).
+
+Introduced `Event::onDispatch()` method to allow events do some tasks when
+being dispatched (used for audio notifications).
+
+Implemented `BuzzerTestCommand` for buzzer tests.
+
+Implemented `Buzzer` and `BuzzerNotes` for audio notifications. 
+
+Introduced `AirIntakeCalibrateCommand` for intake calibration.
+
 Implemented linear correction for sensors.
 
-Multiple changes and fixes. First alfa-state reached.
+Multiple changes and fixes. First alpha-state reached.
 
 `System` classes rewritten for `EventDispatcher`.
 

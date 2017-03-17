@@ -33,14 +33,19 @@ class FixPermissionsInstallCommand extends Command
         /** @var RelayArray $relays */
         $relays = $container['data-sources:relays'];
 
+        $pinOccupants = $relays->toArray();
+        $pinOccupants[] = $container['buzzer'];
+
         /** @todo perhaps there's some more elegant solution? Our own user? */
         $permissions = '777';
 
         /** @var Relay $relay */
-        foreach($relays as $relay) {
+        foreach($pinOccupants as $relay) {
             $pin = $relay->getPin()->getNumber();
             $output->writeln('Sets ' . $permissions . ' permissions for PIN ' . $pin);
             exec('chmod ' . $permissions . ' /sys/class/gpio/gpio' . $pin . '/direction');
         }
+
+
     }
 }

@@ -1,8 +1,6 @@
 <?php
 
-namespace Hellfire\Sensor;
-
-use Coff\OneWire\Sensor\Sensor;
+namespace Coff\Hellfire\Sensor;
 
 class MQ5Sensor extends Sensor
 {

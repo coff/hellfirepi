@@ -3,7 +3,6 @@
 namespace Coff\Hellfire\Sensor;
 
 use Coff\DataSource\DataSource;
-use Coff\OneWire\Sensor\Sensor;
 
 class ExhaustSensor extends Sensor
 {

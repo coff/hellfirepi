@@ -3,6 +3,9 @@
 namespace Hellfire;
 
 use Casadatos\Component\Dashboard\ConsoleDashboard;
+use Casadatos\Component\Dashboard\Gauge\DeltaMemoryGauge;
+use Casadatos\Component\Dashboard\Gauge\ValueGauge;
+use Coff\Hellfire\Buzzer;
 use Coff\Hellfire\Command\Command;
 use Coff\Hellfire\ComponentArray\BoilerSensorArray;
 use Coff\Hellfire\ComponentArray\BufferSensorArray;
@@ -10,13 +13,16 @@ use Coff\Hellfire\ComponentArray\DataSourceArray;
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
 use Coff\Hellfire\ComponentArray\HeaterSensorArray;
 use Coff\Hellfire\ComponentArray\RelayArray;
+use Coff\Hellfire\Event\Event;
 use Coff\Hellfire\EventDispatcher;
 use Coff\Hellfire\Relay\Relay;
 use Coff\Hellfire\Server\HellfireServer;
 use Coff\Hellfire\Servo\AnalogServo;
+use Coff\Hellfire\System\AdvancedAirIntakeSystem;
 use Coff\Hellfire\System\AirIntakeSystem;
 use Coff\Hellfire\System\BoilerSystem;
 use Coff\Hellfire\System\BufferSystem;
+use Coff\Hellfire\System\FailoverAirIntakeSystem;
 use Coff\Hellfire\System\HeaterSystem;
 use Coff\Max6675\Max6675DataSource;
 use Coff\OneWire\Client\AsyncW1Client;
@@ -50,9 +56,25 @@ $container['logger'] = function ($c) {
     return $logger;
 };
 
+$container['buzzer'] = function($c) {
+    /** @var GPIO $gpio */
+    $gpio = $c['gpio'];
+
+    $pin = $gpio->getOutputPin(17);
+
+    return new Buzzer($pin, Buzzer::EMITS_ON_LOW);
+};
+
 $container['dashboard'] = function() {
-    /** @todo use NullDashboard when in deamon mode! */
-    return new ConsoleDashboard();
+    /** @todo use NullDashboard when in daemon mode! */
+    $dash = new ConsoleDashboard();
+
+    $dash
+        ->add('mem_used', new DeltaMemoryGauge(8))
+        ->add('stamp', new ValueGauge(8))
+        ;
+
+    return $dash;
 };
 
 $container['pdo'] = function () {
@@ -198,11 +220,11 @@ $container['data-sources:boiler'] = function ($c) {
     /**
      * Needs correction perhaps due to poor sensor installation.
      */
-    $high->setCorrection(6);
-    $low->setCorrection(6);
+    $high->setCorrection(9);
+    $low->setCorrection(1);
 
     /** boiler output temp. target  */
-    $boilerSensors->setTargets(BoilerSensorArray::SENSOR_HIGH, 86, 1.5);
+    $boilerSensors->setTargets(BoilerSensorArray::SENSOR_HIGH, 84, 1.5);
 
     /** boiler input temp. target */
     $boilerSensors->setTargets(BoilerSensorArray::SENSOR_LOW, 60, 2);
@@ -250,7 +272,7 @@ $container['system:heater'] = function ($c) {
         ->setPump($c['data-sources:relays'][1])
         ->setSensorArray($heaterSensors)
         ->setRoomTempSensor($c['data-sources:one-wire']['28-00000891595f'])
-        ->setTargetRoomTemp(21, 0.5)
+        ->setTargetRoomTemp(20.7, 0.3)
         ->init()
         ;
 
@@ -297,7 +319,7 @@ $container['system:intake'] = function($c) {
 
     $logger->info('Servo initialized.');
 
-    $intake = new AirIntakeSystem();
+    $intake = new FailoverAirIntakeSystem();
     $intake->setLogger($logger);
     $intake
         ->setContainer($c)
@@ -319,6 +341,7 @@ $container['system:intake'] = function($c) {
 };
 
 $container['event:dispatcher'] = function($c) {
+    Event::setContainer($c);
     $eventDispatcher = new EventDispatcher();
     $eventDispatcher->setLogger($c['logger']);
     return $eventDispatcher;

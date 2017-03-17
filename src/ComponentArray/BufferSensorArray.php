@@ -28,7 +28,7 @@ class BufferSensorArray extends DataSourceArray
     protected $lastPowerFill;
 
     /** @var int max and min temp for buffer tank */
-    protected $minTemp=35, $maxTemp=85;
+    protected $minTemp=25, $maxTemp=85;
 
     /**
      * Sets tank's capacity in litres. Mostly for power capacity calculations.

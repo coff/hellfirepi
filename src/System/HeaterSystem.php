@@ -4,10 +4,13 @@ namespace Coff\Hellfire\System;
 
 use Casadatos\Component\Dashboard\ConsoleDashboard;
 use Casadatos\Component\Dashboard\Gauge\ValueGauge;
+use Coff\Hellfire\Buzzer;
+use Coff\Hellfire\BuzzerNotes;
 use Coff\Hellfire\ComponentArray\HeaterSensorArray;
 use Coff\Hellfire\Event\BufferEvent;
 use Coff\Hellfire\Event\CyclicEvent;
 use Coff\Hellfire\Event\Event;
+use Coff\Hellfire\Event\HeaterEvent;
 use Coff\Hellfire\Event\RoomTempEvent;
 use Coff\OneWire\Sensor\SensorInterface;
 
@@ -87,7 +90,7 @@ class HeaterSystem extends System
 
     public function onRoomTempTooLow(RoomTempEvent $event) {
         if ($this->isState(self::STATE_ACTIVE)) {
-            $this->pump->on();
+            $this->enablePump();
         }
     }
 
@@ -98,26 +101,47 @@ class HeaterSystem extends System
             return;
         }
 
-        $this->pump->off();
+        $this->disablePump();
     }
 
     public function onBufferFillingFull(Event $event) {
-        $this->pump->on();
+        $this->enablePump();
         $this->setState(self::STATE_OVERHEAT);
     }
 
     public function onBufferDroppingEmpty(Event $event) {
         $this->setState(self::STATE_OFF);
-        $this->pump->off();
+        $this->disablePump();
     }
 
     public function onBufferFillingNotEmpty(Event $event) {
         $this->setState(self::STATE_ACTIVE);
-        $this->pump->on();
     }
 
     public function onBufferDroppingNotFull(Event $event) {
         $this->setState(self::STATE_ACTIVE);
+    }
+
+    /**
+     * Enables heater system pump and dispatches proper event
+     */
+    public function enablePump() {
+        if ($this->pump->isOff()) {
+            $this->getEventDispatcher()->dispatch(HeaterEvent::PUMP_ENABLED, new HeaterEvent());
+        }
+
+        $this->pump->on();
+    }
+
+    /**
+     * Disables heater system pump and dispatches proper event
+     */
+    public function disablePump() {
+        if ($this->pump->isOn()) {
+            $this->getEventDispatcher()->dispatch(HeaterEvent::PUMP_DISABLED, new HeaterEvent());
+        }
+        $this->pump->off();
+
     }
 
     /**

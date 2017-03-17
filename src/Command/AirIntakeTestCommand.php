@@ -12,7 +12,7 @@ class AirIntakeTestCommand extends Command
     public function configure()
     {
         $this
-            ->setName('test:air-intake')
+            ->setName('test:intake')
             ->setDescription('Performs tests on air-intake shutter. Be careful with this!')
         ;
     }
@@ -35,7 +35,7 @@ class AirIntakeTestCommand extends Command
         $airIntake->close();
 
         $output->writeln('Step by step up:'); $this->sleep();
-        while (!$airIntake->isMax()) {
+        while (!$airIntake->getServo()->isMax()) {
             $airIntake->stepUp();
             $output->writeln($airIntake->getServo()->getSignalLength());
             $this->sleep(0.5);
@@ -43,7 +43,7 @@ class AirIntakeTestCommand extends Command
         $output->writeln('');
 
         $output->writeln('Step by step down:'); $this->sleep();
-        while (!$airIntake->isMin()) {
+        while (!$airIntake->getServo()->isMin()) {
             $airIntake->stepDown();
             $output->writeln($airIntake->getServo()->getSignalLength());
             $this->sleep(0.5);

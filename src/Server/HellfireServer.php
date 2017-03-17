@@ -3,6 +3,8 @@
 namespace Coff\Hellfire\Server;
 
 use Casadatos\Component\Dashboard\Dashboard;
+use Coff\Hellfire\Buzzer;
+use Coff\Hellfire\BuzzerNotes;
 use Coff\Hellfire\ComponentArray\Adapter\DatabaseStorageAdapter;
 use Coff\Hellfire\Event\CyclicEvent;
 use Coff\OneWire\Client\AsyncW1Client;
@@ -31,12 +33,20 @@ class HellfireServer extends Server
 
         $this->addShortCycleCallback('3s', [$this, 'every3s']);
         $this->addShortCycleCallback('10s', [$this, 'every10s']);
+        $this->addShortCycleCallback('15s', [$this, 'every15s']);
         $this->addShortCycleCallback('30s', [$this, 'every30s']);
         $this->addShortCycleCallback('1m', [$this, 'every1m']);
         $this->addShortCycleCallback('2m', [$this, 'every2m']);
         $this->addShortCycleCallback('10m', [$this, 'every10m']);
 
         $this->logger->info('Hellfire server initialized properly');
+
+        /** @var Buzzer $buzzer */
+        $buzzer = $this->getContainer()['buzzer'];
+
+        $notes = new BuzzerNotes();
+        $notes->add([1,0,1,0], 1000000);
+        $buzzer->setNotes($notes)->play();
     }
 
     public function loop()
@@ -60,11 +70,16 @@ class HellfireServer extends Server
 
         /** @var Dashboard $dashboard */
         $dashboard = $this->getContainer()['dashboard'];
+        $dashboard->update('stamp', date('H:i:s'));
         $dashboard->refresh();
     }
 
     public function every10s() {
         $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_10_SECOND, new CyclicEvent());
+    }
+
+    public function every15s() {
+        $this->getEventDispatcher()->dispatch(CyclicEvent::EVERY_15_SECOND, new CyclicEvent());
     }
 
     public function every30s() {
