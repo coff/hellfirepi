@@ -3,7 +3,6 @@
 namespace Coff\Hellfire\System;
 
 use Coff\Hellfire\ComponentArray\BoilerSensorArray;
-use Coff\Hellfire\Event\BoilerTempEvent;
 use Coff\Hellfire\Event\CyclicEvent;
 
 class FailoverAirIntakeSystem extends AirIntakeSystem
@@ -28,7 +27,13 @@ class FailoverAirIntakeSystem extends AirIntakeSystem
         /** @var BoilerSensorArray $boilerSensors */
         $boilerSensors = $this->getContainer()['data-sources:boiler'];
 
-        $percent = $boilerSensors->getTargetPercent(BoilerSensorArray::SENSOR_HIGH, 3);
+        $temp = $boilerSensors->getReading(BoilerSensorArray::SENSOR_HIGH);
+
+        if ($temp < 60) {
+            $this->servo->setRelative(1); // fully open
+        }
+
+        $percent = $boilerSensors->getTargetPercent(BoilerSensorArray::SENSOR_HIGH, 5);
 
         /* we make sure value is not out of these bounds */
         if ($percent > 100) {
@@ -57,9 +62,9 @@ class FailoverAirIntakeSystem extends AirIntakeSystem
            annoying noises for a long time after moving up */
         if ($newPosition > $currentPosition) {
             $this->servo
-                ->setRelative($newPosition + 0.1)
+                ->setRelative($newPosition + 0.02)
                 ->send();
-            usleep(300000);
+            usleep(200000);
         }
 
         $this->servo

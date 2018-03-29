@@ -18,8 +18,11 @@ class AirIntakeCalibrateCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $container = $this->getContainer();
+        $container['running_command'] = $this;
+
         /** @var AirIntakeSystem $intake */
-        $intake = $this->getContainer()['system:intake'];
+        $intake = $container['system:intake'];
 
         $servo = $intake->getServo();
 

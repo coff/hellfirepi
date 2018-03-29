@@ -28,6 +28,7 @@ class RelaysTestCommand extends Command
     {
         /** @var Container $container */
         $container = $this->getContainer();
+        $container['running_command'] = $this;
 
         /** @var RelayArray $relays */
         $relays = $container['data-sources:relays'];

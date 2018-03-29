@@ -224,7 +224,7 @@ $container['data-sources:boiler'] = function ($c) {
     $low->setCorrection(1);
 
     /** boiler output temp. target  */
-    $boilerSensors->setTargets(BoilerSensorArray::SENSOR_HIGH, 84, 1.5);
+    $boilerSensors->setTargets(BoilerSensorArray::SENSOR_HIGH, 86, 2);
 
     /** boiler input temp. target */
     $boilerSensors->setTargets(BoilerSensorArray::SENSOR_LOW, 60, 2);
@@ -272,7 +272,7 @@ $container['system:heater'] = function ($c) {
         ->setPump($c['data-sources:relays'][1])
         ->setSensorArray($heaterSensors)
         ->setRoomTempSensor($c['data-sources:one-wire']['28-00000891595f'])
-        ->setTargetRoomTemp(20.7, 0.3)
+        ->setTargetRoomTemp(21, 0.3)
         ->init()
         ;
 
@@ -308,7 +308,7 @@ $container['system:intake'] = function($c) {
     /** @var Logger $logger */
     $logger = $c['logger'];
 
-    $servo = new AnalogServo(800,2440);
+    $servo = new AnalogServo(800,2350);
 
     $logger->info('Initializing servo...');
 

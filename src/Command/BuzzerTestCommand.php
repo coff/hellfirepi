@@ -22,6 +22,7 @@ class BuzzerTestCommand extends Command
     {
         /** @var Container $container */
         $container = $this->getContainer();
+        $container['running_command'] = $this;
 
         /** @var Buzzer $buzzer */
         $buzzer = $container['buzzer'];

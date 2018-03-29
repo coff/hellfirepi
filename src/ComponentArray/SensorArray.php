@@ -34,8 +34,8 @@ class SensorArray extends DataSourceArray
 
     public function getTargetPercent($sensorId, $hysteresis = 0) {
 
-        $aboveRoomTemp = $this->readings[$sensorId] - 20;
-        $targetAboveRoomTemp =  $this->targets[$sensorId] - 20 + $hysteresis;
+        $aboveRoomTemp = $this->readings[$sensorId] - 50;
+        $targetAboveRoomTemp =  $this->targets[$sensorId] - 50 + $hysteresis;
 
         return $aboveRoomTemp / $targetAboveRoomTemp * 100;
     }

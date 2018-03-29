@@ -43,7 +43,7 @@ class BufferSystem extends System
 
         if ($sensorArray->isPowerFillRising()) {
             switch (true) {
-                case $fill > 80:
+                case $fill > 89:
                     $eventType = BufferEvent::ON_FILLING_FULL;
                     break;
                 case $fill > 70:
@@ -65,7 +65,7 @@ class BufferSystem extends System
                 case $fill < 20:
                     $eventType = BufferEvent::ON_DROPPING_NEAR_EMPTY;
                     break;
-                case $fill < 95:
+                case $fill < 85:
                     $eventType = BufferEvent::ON_DROPPING_NOT_FULL;
                     break;
 

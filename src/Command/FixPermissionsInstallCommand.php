@@ -27,6 +27,7 @@ class FixPermissionsInstallCommand extends Command
         /** set permissions over RaspberryPi pins */
 
         $container = $this->getContainer();
+        $container['running_command'] = $this;
 
         /** pins configured for relays */
 
