@@ -38,6 +38,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\StreamOutput;
+use Volantus\Pigpio\Client;
+use Volantus\Pigpio\Network\Socket;
 
 /*
  * @todo extract configuration parameters into a separate readable config file.
@@ -185,8 +187,9 @@ $container['data-sources:all'] = function ($c) {
         $allDataSources[$key] = $sensor;
     }
 
-    $allDataSources['max6675:0'] = $thermocouple = new ExhaustSensor(new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000));
+    $allDataSources['max6675:0'] = $thermocouple = new ExhaustSensor($ds = new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000));
 
+    $ds->setPigpioClient($c['client:pigpio']);
     $thermocouple->init();
 
     /**
@@ -281,7 +284,7 @@ $container['system:heater'] = function ($c) {
 
 $container['system:buffer'] = function ($c) {
     $bufferSensors = new BufferSensorArray();
-    $bufferSensors->setCapacity(800);
+    $bufferSensors->setCapacity(1600);
 
     // @todo install high sensor on buffer tank
     $bufferSensors[BufferSensorArray::SENSOR_HIGH] = $c['data-sources:one-wire']['28-0000088fc71c'];
@@ -300,6 +303,10 @@ $container['system:buffer'] = function ($c) {
     return $buffer;
 };
 
+$container['client:pigpio'] = function($c) {
+    return new Client(new Socket('127.0.0.1', 8888));
+};
+
 $container['system:intake'] = function($c) {
 
     /** @var DataSourceArray $boilerSensors */
@@ -313,9 +320,10 @@ $container['system:intake'] = function($c) {
     $logger->info('Initializing servo...');
 
     $servo
-        ->setGpio(0) // ServoBlaster configured on PIN 15 but as device 0 internally
+        ->setPigpioClient($c['client:pigpio'])
+        ->setGpio(22)
         ->setStepLength(20)
-        ->init(); // sets arm to initial position
+        ->init();
 
     $logger->info('Servo initialized.');
 
@@ -330,6 +338,8 @@ $container['system:intake'] = function($c) {
         ->setServo($servo)
         ->init()
         ;
+
+    $servo->init(); // sets arm to initial position
 
     /** @var DataSourceArray $dataSourcesAll */
     $dataSourcesAll = $c['data-sources:all'];

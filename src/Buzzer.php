@@ -51,19 +51,20 @@ class Buzzer
         $forkSuccess = null;
 
         if ($inBackground) {
+            /*
             $res = pcntl_fork();
             switch (true) {
                 case $res > 0:
-                    /* we're parent */
+                    // we're parent
                     return;
                 case $res === 0:
-                    /* we're child */
+                    // we're child
                     $forkSuccess = true;
                     break;
                 case $res < 0:
-                    /* Error! Continue in foreground! */
+                    // Error! Continue in foreground!
                     break;
-            }
+            }*/
         }
 
         $notes = $this->buzzerNotes->getNotes();

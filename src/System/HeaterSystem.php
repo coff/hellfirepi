@@ -89,9 +89,9 @@ class HeaterSystem extends System
     }
 
     public function onRoomTempTooLow(RoomTempEvent $event) {
-        if ($this->isState(self::STATE_ACTIVE)) {
+      //  if ($this->isState(self::STATE_ACTIVE)) {
             $this->enablePump();
-        }
+      //  }
     }
 
     public function onRoomTempTooHigh(RoomTempEvent $event) {

@@ -54,6 +54,7 @@
         "coff/php-spi-max6675": "~0.0.2",
         "pimple/pimple": "~3.0",
         "symfony/event-dispatcher": "^3.2",
-        "casadatos/dashboard": "^0.0.2"
+        "casadatos/dashboard": "^0.0.2",
+        "volantus/php-pigpio": "^0.3.0"
     }
 }

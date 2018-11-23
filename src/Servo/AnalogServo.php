@@ -3,6 +3,9 @@
 namespace Coff\Hellfire\Servo;
 
 use Coff\DataSource\DataSourceInterface;
+use Volantus\Pigpio\Client;
+use Volantus\Pigpio\Network\Socket;
+use Volantus\Pigpio\PWM\PwmSender;
 
 /**
  * AnalogServo for analog servo control over ServoBlaster library
@@ -36,6 +39,9 @@ class AnalogServo implements DataSourceInterface {
      */
     protected $stepLength=4;
 
+    protected $sender;
+    protected $client;
+
     /**
      * @param int $signalMin
      * @param int $signalMax
@@ -47,7 +53,21 @@ class AnalogServo implements DataSourceInterface {
 
     public function init()
     {
+
+        $this->sender = new PwmSender($this->client);
+
         $this->setRelative(0.5); // start with neutral position?
+
+        return $this;
+    }
+
+
+    /**
+     * @param Client $client
+     * @return $this
+     */
+    public function setPigpioClient($client) {
+        $this->client = $client;
 
         return $this;
     }
@@ -167,7 +187,19 @@ class AnalogServo implements DataSourceInterface {
             throw new HellfireException('Servo signal out of range!');
         }*/
 
-        system('echo "' . $this->gpio . '=' . $this->signalLength . 'us" > /dev/servoblaster');
+//        system('echo "m ' . $this->gpio . ' w s ' . $this->gpio . ' ' . $this->signalLength . '" > /dev/pigpio');
+ //       exec('/usr/bin/pigs s ' . $this->gpio . ' ' . $this->signalLength);
+
+  /*      $h = fopen("/dev/pigpio", "w");
+
+        if ($h === false) {
+            echo "Error opening pigpio! \n";
+        }
+
+        fprintf($h, "s " . $this->gpio . " ". $this->signalLength . "\n");
+        fclose($h);*/
+
+        $this->sender->setPulseWidth($this->gpio, $this->signalLength);
 
         return $this;
     }

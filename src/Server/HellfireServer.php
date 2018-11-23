@@ -98,9 +98,9 @@ class HellfireServer extends Server
          * Store sensors readings
          */
         /** @var DatabaseStorageAdapter $storageAdapter */
-        $storageAdapter = $this->container['data-sources-storage'];
+   /*     $storageAdapter = $this->container['data-sources-storage'];
         $storageAdapter->store();
-        $this->logger->debug('Stored sensor readings.');
+        $this->logger->debug('Stored sensor readings.');*/
     }
 
     public function every2m() {
@@ -122,7 +122,9 @@ class HellfireServer extends Server
          * Clean old readings
          */
         /** @var DatabaseStorageAdapter $storageAdapter */
+        /*
         $storageAdapter = $this->container['data-sources-storage'];
         $storageAdapter->clean();
+        */
     }
 }

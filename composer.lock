@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "608ac3a7a2f0090a8020b220e66fa16a",
-    "content-hash": "321d19493925f07be65d7deb6f185ffa",
+    "content-hash": "d44445a24f490f79e55cef8c9b64f755",
     "packages": [
         {
             "name": "casadatos/dashboard",
@@ -35,7 +34,7 @@
                 "source": "https://github.com/coff/dashboard/tree/v0.0.2",
                 "issues": "https://github.com/coff/dashboard/issues"
             },
-            "time": "2017-03-11 15:01:41"
+            "time": "2017-03-11T15:01:41+00:00"
         },
         {
             "name": "coff/php-api-datasource",
@@ -71,7 +70,7 @@
                 "source": "https://github.com/coff/php-api-datasource/tree/v0.0.4",
                 "issues": "https://github.com/coff/php-api-datasource/issues"
             },
-            "time": "2017-02-19 23:01:04"
+            "time": "2017-02-19T23:01:04+00:00"
         },
         {
             "name": "coff/php-spi-max6675",
@@ -111,7 +110,7 @@
                 "source": "https://github.com/coff/php-spi-max6675/tree/v0.0.2",
                 "issues": "https://github.com/coff/php-spi-max6675/issues"
             },
-            "time": "2017-02-24 21:20:11"
+            "time": "2017-02-24T21:20:11+00:00"
         },
         {
             "name": "coff/php-spi-mcp3008",
@@ -151,20 +150,20 @@
                 "source": "https://github.com/coff/php-spi-mcp3008/tree/master",
                 "issues": "https://github.com/coff/php-spi-mcp3008/issues"
             },
-            "time": "2017-02-19 23:40:45"
+            "time": "2017-02-19T23:40:45+00:00"
         },
         {
             "name": "coff/php-w1-server-client",
-            "version": "v0.0.5",
+            "version": "v0.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/coff/php-w1-server-client.git",
-                "reference": "ff674ee2166ced3c841ec0393a5f5d536bc7d601"
+                "reference": "94e88808c45a36ae1e7249754a7b7ea62707ac9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/coff/php-w1-server-client/zipball/ff674ee2166ced3c841ec0393a5f5d536bc7d601",
-                "reference": "ff674ee2166ced3c841ec0393a5f5d536bc7d601",
+                "url": "https://api.github.com/repos/coff/php-w1-server-client/zipball/94e88808c45a36ae1e7249754a7b7ea62707ac9c",
+                "reference": "94e88808c45a36ae1e7249754a7b7ea62707ac9c",
                 "shasum": ""
             },
             "require": {
@@ -190,10 +189,10 @@
             ],
             "description": "One-Wire (1-wire) devices server & client",
             "support": {
-                "source": "https://github.com/coff/php-w1-server-client/tree/v0.0.5",
+                "source": "https://github.com/coff/php-w1-server-client/tree/v0.0.7",
                 "issues": "https://github.com/coff/php-w1-server-client/issues"
             },
-            "time": "2017-03-12 01:09:17"
+            "time": "2018-11-12T17:19:42+00:00"
         },
         {
             "name": "garoevans/php-enum",
@@ -250,7 +249,7 @@
                 "source": "https://github.com/garoevans/php-enum/tree/1.2.0",
                 "issues": "https://github.com/garoevans/php-enum/issues"
             },
-            "time": "2014-10-09 22:41:24"
+            "time": "2014-10-09T22:41:24+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -328,7 +327,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-11-26 00:15:39"
+            "time": "2016-11-26T00:15:39+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -374,7 +373,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2015-09-11 15:10:35"
+            "time": "2015-09-11T15:10:35+00:00"
         },
         {
             "name": "piphp/gpio",
@@ -422,7 +421,7 @@
                 "source": "https://github.com/PiPHP/GPIO/tree/v0.3.3",
                 "issues": "https://github.com/PiPHP/GPIO/issues"
             },
-            "time": "2016-07-09 11:38:12"
+            "time": "2016-07-09T11:38:12+00:00"
         },
         {
             "name": "psr/log",
@@ -469,7 +468,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "symfony/console",
@@ -532,7 +531,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-06 19:30:27"
+            "time": "2017-03-06T19:30:27+00:00"
         },
         {
             "name": "symfony/debug",
@@ -589,7 +588,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-18 17:28:00"
+            "time": "2017-02-18T17:28:00+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -649,7 +648,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-21 09:12:04"
+            "time": "2017-02-21T09:12:04+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -708,7 +707,49 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
+        },
+        {
+            "name": "volantus/php-pigpio",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Volantus/php-pigpio.git",
+                "reference": "e9ea4db81a465391c706ac2ad72278bfc55a8dc4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Volantus/php-pigpio/zipball/e9ea4db81a465391c706ac2ad72278bfc55a8dc4",
+                "reference": "e9ea4db81a465391c706ac2ad72278bfc55a8dc4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0"
+            },
+            "require-dev": {
+                "doctrine/instantiator": "~1.0.5",
+                "phpunit/phpunit": "^6.5",
+                "symfony/filesystem": "~3.4.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Volantus\\Pigpio\\": "src",
+                    "Volantus\\Pigpio\\Tests\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Marius Meissner",
+                    "email": "marius.meissner@volantus.org"
+                }
+            ],
+            "description": "PHP client for the pigpio daemon library",
+            "time": "2018-06-22T13:50:10+00:00"
         }
     ],
     "packages-dev": [],

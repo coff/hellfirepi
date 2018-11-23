@@ -11,6 +11,7 @@ use Coff\Hellfire\Command\FixPermissionsInstallCommand;
 use Coff\Hellfire\Command\HellfireServerCommand;
 use Coff\Hellfire\Command\RelaysTestCommand;
 use Coff\Hellfire\Command\StorageInstallCommand;
+use Coff\Hellfire\Command\ThermocoupleTestCommand;
 use Coff\Hellfire\Command\W1ServerCommand;
 use Pimple\Container;
 
@@ -21,6 +22,7 @@ $container = new Container();
 require (__DIR__ . '/app/bootstrap.php');
 
 $app = new HellfireApplication('HellfirePi', '0.0.1');
+$app->setCatchExceptions(false);
 $app->setContainer($container);
 
 /** Install commands */
@@ -35,6 +37,8 @@ $app->add(new HellfireServerCommand());
 $app->add(new AirIntakeTestCommand());
 $app->add(new RelaysTestCommand());
 $app->add(new BuzzerTestCommand());
+$app->add(new ThermocoupleTestCommand());
+
 
 /** Calibration commands */
 $app->add(new AirIntakeCalibrateCommand());
