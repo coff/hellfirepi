@@ -17,13 +17,10 @@ use Pimple\Container;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$container = new Container();
-
 require (__DIR__ . '/app/bootstrap.php');
 
 $app = new HellfireApplication('HellfirePi', '0.0.1');
 $app->setCatchExceptions(false);
-$app->setContainer($container);
 
 /** Install commands */
 $app->add(new StorageInstallCommand());

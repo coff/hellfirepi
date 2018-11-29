@@ -12,18 +12,16 @@ use Coff\Hellfire\Event\CyclicEvent;
 use Coff\Hellfire\Event\Event;
 use Coff\Hellfire\Event\HeaterEvent;
 use Coff\Hellfire\Event\RoomTempEvent;
+use Coff\Hellfire\StateEnum\BufferStateEnum;
+use Coff\Hellfire\StateEnum\HeaterStateEnum;
 use Coff\OneWire\Sensor\SensorInterface;
+use Coff\SMF\Assertion\AlwaysFalseAssertion;
 
 class HeaterSystem extends System
 {
     use PumpTrait;
     use SensorArrayTrait;
     use DashboardTrait;
-
-    const
-        STATE_ACTIVE        = 'active',
-        STATE_OVERHEAT      = 'overheat',
-        STATE_OFF           = 'off';
 
     /**
      * @var SensorInterface
@@ -35,22 +33,19 @@ class HeaterSystem extends System
     protected $roomTempHysteresis = 0.5;
 
     public function init() {
-        $eventDispatcher = $this->getEventDispatcher();
 
-        $eventDispatcher->addListener(CyclicEvent::EVERY_MINUTE,
-            [$this, 'everyMinute']);
-        $eventDispatcher->addListener(RoomTempEvent::ON_TOO_HIGH,
-            [$this, 'onRoomTempTooHigh']);
-        $eventDispatcher->addListener(RoomTempEvent::ON_TOO_LOW,
-            [$this, 'onRoomTempTooLow']);
-        $eventDispatcher->addListener(BufferEvent::ON_FILLING_FULL,
-            [$this, 'onBufferFillingFull']);
-        $eventDispatcher->addListener(BufferEvent::ON_DROPPING_NOT_FULL,
-            [$this, 'onBufferDroppingNotFull']);
-        $eventDispatcher->addListener(BufferEvent::ON_FILLING_NOT_EMPTY,
-            [$this, 'onBufferFillingNotEmpty']);
-        $eventDispatcher->addListener(BufferEvent::ON_DROPPING_EMPTY,
-            [$this, 'onBufferDroppingEmpty']);
+        // standard on-off behavior
+        $this
+            ->allowTransition(HeaterStateEnum::OFF(), HeaterStateEnum::ON())
+            ->allowTransition(HeaterStateEnum::ON(), HeaterStateEnum::OFF())
+
+            ->allowTransition(HeaterStateEnum::OFF(), HeaterStateEnum::ACTIVE())
+            ->allowTransition(HeaterStateEnum::ACTIVE(), HeaterStateEnum::OFF())
+
+            ->allowTransition(HeaterStateEnum::OFF(), HeaterStateEnum::EXTON(), new AlwaysFalseAssertion())
+            ->allowTransition(HeaterStateEnum::EXTON(), HeaterStateEnum::OFF(), new AlwaysFalseAssertion())
+
+            ;
 
         $this->getDashboard()
             ->add('HeatP', new ValueGauge(5))
@@ -63,15 +58,81 @@ class HeaterSystem extends System
         return parent::init();
     }
 
+    public function assertOffToActive() {
+
+        /** @var BufferSystem $buffer */
+        $buffer = $this->getContainer()['system:buffer'];
+        return $buffer->isMachineState(BufferStateEnum::NOTEMPTY()) ? true : false;
+    }
+
+    public function assertActiveToOff() {
+        /** @var BufferSystem $buffer */
+        $buffer = $this->getContainer()['system:buffer'];
+        return $buffer->isMachineState(BufferStateEnum::NOTEMPTY()) ? false : true;
+    }
+
+    public function assertOffToOn() {
+        /** @var BufferSystem $buffer */
+        $buffer = $this->getContainer()['system:buffer'];
+        return $buffer->isMachineState(BufferStateEnum::FULL()) ? true : false;
+    }
+
+    public function assertOnToOff() {
+        /** @var BufferSystem $buffer */
+        $buffer = $this->getContainer()['system:buffer'];
+        return $buffer->isMachineState(BufferStateEnum::FULL()) ? false : true;
+    }
+
+    /**
+     * Enables pump and switches system to EXTON state
+     */
+    public function on()
+    {
+        $this->getPump()->on();
+
+        // if state any other than off then switch it off first
+        if (!$this->isMachineState(HeaterStateEnum::OFF())) {
+            $this->setMachineState(HeaterStateEnum::OFF());
+        }
+
+        $this->setMachineState(HeaterStateEnum::EXTON());
+    }
+
+    /**
+     * Disables pump and switches system to OFF state
+     */
+    public function off()
+    {
+        $this->getPump()->off();
+        $this->setMachineState(HeaterStateEnum::OFF());
+    }
+
+    public static function getSubscribedEvents()
+    {
+        $events = parent::getSubscribedEvents();
+
+        $events[CyclicEvent::EVERY_MINUTE] = 'everyMinute';
+
+        return $events;
+    }
+
     public function update() {
         $this->sensorArray->update();
         $this->roomTempSensor->update();
         $this->roomTemp = $this->roomTempSensor->getValue();
 
-        if ($this->roomTemp < $this->targetRoomTemp - $this->roomTempHysteresis) {
-            $this->getEventDispatcher()->dispatch(RoomTempEvent::ON_TOO_LOW, new RoomTempEvent());
-        } elseif ($this->roomTemp >  $this->targetRoomTemp + $this->roomTempHysteresis) {
-            $this->getEventDispatcher()->dispatch(RoomTempEvent::ON_TOO_HIGH, new RoomTempEvent());
+        $this->run();
+
+        if ($this->isMachineState(HeaterStateEnum::ACTIVE())) {
+            /*
+             * Active state room temp control here
+             */
+
+            if ($this->roomTemp > $this->targetRoomTemp + $this->roomTempHysteresis) {
+                $this->getPump()->on();
+            } elseif ($this->roomTemp < $this->targetRoomTemp - $this->roomTempHysteresis) {
+                $this->getPump()->off();
+            }
         }
 
         $this->getDashboard()
@@ -86,62 +147,6 @@ class HeaterSystem extends System
     public function everyMinute(CyclicEvent $event)
     {
         $this->update();
-    }
-
-    public function onRoomTempTooLow(RoomTempEvent $event) {
-      //  if ($this->isState(self::STATE_ACTIVE)) {
-            $this->enablePump();
-      //  }
-    }
-
-    public function onRoomTempTooHigh(RoomTempEvent $event) {
-
-        /** we can't disable that pump in such state */
-        if ($this->isState(self::STATE_OVERHEAT)) {
-            return;
-        }
-
-        $this->disablePump();
-    }
-
-    public function onBufferFillingFull(Event $event) {
-        $this->enablePump();
-        $this->setState(self::STATE_OVERHEAT);
-    }
-
-    public function onBufferDroppingEmpty(Event $event) {
-        $this->setState(self::STATE_OFF);
-        $this->disablePump();
-    }
-
-    public function onBufferFillingNotEmpty(Event $event) {
-        $this->setState(self::STATE_ACTIVE);
-    }
-
-    public function onBufferDroppingNotFull(Event $event) {
-        $this->setState(self::STATE_ACTIVE);
-    }
-
-    /**
-     * Enables heater system pump and dispatches proper event
-     */
-    public function enablePump() {
-        if ($this->pump->isOff()) {
-            $this->getEventDispatcher()->dispatch(HeaterEvent::PUMP_ENABLED, new HeaterEvent());
-        }
-
-        $this->pump->on();
-    }
-
-    /**
-     * Disables heater system pump and dispatches proper event
-     */
-    public function disablePump() {
-        if ($this->pump->isOn()) {
-            $this->getEventDispatcher()->dispatch(HeaterEvent::PUMP_DISABLED, new HeaterEvent());
-        }
-        $this->pump->off();
-
     }
 
     /**

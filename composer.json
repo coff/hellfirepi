@@ -32,10 +32,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/PiPHP/GPIO.git"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/coff/dashboard.git"
         }
     ],
@@ -45,13 +41,14 @@
         }
     },
     "require": {
-        "piphp/gpio": "^0.3",
+        "php": "^7.0",
+        "ext-readline": "*",
         "garoevans/php-enum": "^1.2",
         "monolog/monolog": "^1.22",
         "symfony/console": "^3.2",
+        "coff/state-machine-framework": "^0.1",
         "coff/php-w1-server-client": "~0.0.4",
         "coff/php-spi-mcp3008": "~0.0.3",
-        "coff/php-spi-max6675": "~0.0.2",
         "pimple/pimple": "~3.0",
         "symfony/event-dispatcher": "^3.2",
         "casadatos/dashboard": "^0.0.2",

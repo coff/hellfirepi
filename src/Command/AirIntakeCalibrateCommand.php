@@ -5,7 +5,6 @@ namespace Coff\Hellfire\Command;
 use Coff\Hellfire\System\AirIntakeSystem;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Volantus\BerrySpi\RegularInterface;
 
 class AirIntakeCalibrateCommand extends Command
 {
@@ -19,10 +18,7 @@ class AirIntakeCalibrateCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        RegularInterface::initialize();
-
         $container = $this->getContainer();
-        $container['running_command'] = $this;
 
         /** @var AirIntakeSystem $intake */
         $intake = $container['system:intake'];

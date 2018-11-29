@@ -22,7 +22,6 @@ class AirIntakeTestCommand extends Command
 
         /** @var Container $container */
         $container = $this->getContainer();
-        $container['running_command'] = $this;
 
         $output->writeln('Air Intake System init'); $this->sleep();
 
