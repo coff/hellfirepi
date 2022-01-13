@@ -51,6 +51,9 @@ class DataSourceArray extends ComponentArray
      */
     public function getReading($sensorId)
     {
+        if (!isset($this->readings[$sensorId])) {
+            throw new HellfireException('No reading for ' . $sensorId);
+        }
         return $this->readings[$sensorId];
     }
 

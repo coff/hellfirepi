@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## dev-master
+Some minor updates and changes ahead of some major refactoring plans. 
 
 Introduced `FailoverAirIntakeSystem` for handling intake shutter when 
 thermocouple fails to get readings (automatic switch is yet to be implemented).

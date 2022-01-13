@@ -40,6 +40,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\StreamOutput;
 use Volantus\Pigpio\Client;
 use Volantus\Pigpio\Network\Socket;
+use Volantus\Pigpio\SPI\RegularSpiDevice;
 
 /*
  * @todo extract configuration parameters into a separate readable config file.
@@ -187,9 +188,13 @@ $container['data-sources:all'] = function ($c) {
         $allDataSources[$key] = $sensor;
     }
 
-    $allDataSources['max6675:0'] = $thermocouple = new ExhaustSensor($ds = new Max6675DataSource($busNumber = 0, $cableSelect = 1, $speedHz = 4300000));
+    $dataSource = new Max6675DataSource();
+    $device = new RegularSpiDevice($c['client:pigpio'], 1, 32000);
+    $device->open();
+    $dataSource->setSpiDevice($device);
 
-    $ds->setPigpioClient($c['client:pigpio']);
+    $allDataSources['max6675:0'] = $thermocouple = new ExhaustSensor($dataSource);
+
     $thermocouple->init();
 
     /**
@@ -275,7 +280,7 @@ $container['system:heater'] = function ($c) {
         ->setPump($c['data-sources:relays'][1])
         ->setSensorArray($heaterSensors)
         ->setRoomTempSensor($c['data-sources:one-wire']['28-00000891595f'])
-        ->setTargetRoomTemp(21, 0.3)
+        ->setTargetRoomTemp(21.3, 0.3)
         ->init()
         ;
 

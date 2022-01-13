@@ -45,16 +45,16 @@
         }
     },
     "require": {
-        "piphp/gpio": "^0.3",
+        "piphp/gpio": "0.4.*",
         "garoevans/php-enum": "^1.2",
         "monolog/monolog": "^1.22",
         "symfony/console": "^3.2",
         "coff/php-w1-server-client": "~0.0.4",
-        "coff/php-spi-mcp3008": "~0.0.3",
-        "coff/php-spi-max6675": "~0.0.2",
+        "coff/php-spi-max6675": "0.0.*",
         "pimple/pimple": "~3.0",
         "symfony/event-dispatcher": "^3.2",
         "casadatos/dashboard": "^0.0.2",
-        "volantus/php-pigpio": "^0.3.0"
+        "volantus/php-pigpio": "^0.3.0",
+        "php-mqtt/client": "1.1.*"
     }
 }
